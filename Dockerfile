@@ -27,7 +27,7 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 ENV DATABASE_URL="file:./dev.db"
 
 # Copy standalone output + static files + public assets + db
@@ -41,6 +41,6 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 
-EXPOSE 3000
+EXPOSE 10000
 
 CMD ["node", "server.js"]
