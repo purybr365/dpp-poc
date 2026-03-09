@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============================================================
+// AUTH & USERS
+// ============================================================
+
+enum UserRole {
+  MANUFACTURER
+  RETAILER
+  CONSUMER
+  REPAIR_TECH
+  RECYCLER
+  REGULATOR
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  passwordHash  String
+  role          UserRole
+  organization  String?
+  cnpj          String?
+  createdAt     DateTime @default(now())
+
+  repairEvents     RepairEvent[]
+  ownershipEvents  OwnershipEvent[] @relation("EventCreator")
+  endOfLifeRecords EndOfLifeRecord[]
+  products         Product[]        @relation("ManufacturedBy")
+}
+
+// ============================================================
+// CORE PRODUCT
+// ============================================================
+
+enum ProductCategory {
+  REFRIGERATOR
+  WASHING_MACHINE
+  AIR_CONDITIONER
+  STOVE
+  MICROWAVE
+  DRYER
+  DISHWASHER
+}
+
+enum LifecycleStage {
+  MANUFACTURED
+  IN_TRANSIT
+  SOLD
+  IN_USE
+  UNDER_REPAIR
+  RESOLD
+  COLLECTED
+  RECYCLED
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  uid              String           @unique // urn:dpp:br:{gtin}:{serial}
+  gtin             String?
+  serialNumber     String
+  category         ProductCategory
+  brand            String
+  model            String
+  productCode      String?
+
+  manufacturingDate     DateTime
+  manufacturingFacility String
+  batchNumber           String?
+  productImageUrl       String?
+
+  lifecycleStage   LifecycleStage @default(MANUFACTURED)
+
+  manufacturerId   String?
+  manufacturer     User?          @relation("ManufacturedBy", fields: [manufacturerId], references: [id])
+
+  // JSONB passport sections
+  supplyChainData     Json? // BOM, materials, weights, suppliers
+  environmentalData   Json? // Carbon footprint, energy rating, hazardous substances
+  operatingManualData Json? // PDF links, warranty, safety info
+  regulatoryData      Json? // INMETRO, Selo Procel, ESPR alignment
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  repairEvents      RepairEvent[]
+  ownershipEvents   OwnershipEvent[]
+  endOfLifeRecords  EndOfLifeRecord[]
+
+  @@index([category])
+  @@index([brand])
+  @@index([serialNumber])
+  @@index([lifecycleStage])
+}
+
+// ============================================================
+// REPAIR & MAINTENANCE
+// ============================================================
+
+model RepairEvent {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  date             DateTime
+  serviceCenterId  String?
+  technicianId     String?
+  technician       User?   @relation(fields: [technicianId], references: [id])
+
+  issueDescription String
+  partsReplaced    Json? // [{partNumber, name, cost}]
+  laborCost        Float?
+  totalCost        Float?
+  currency         String  @default("BRL")
+  postRepairStatus String? // "passed", "failed", "conditional"
+  notes            String?
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+// ============================================================
+// OWNERSHIP & USAGE
+// ============================================================
+
+enum OwnershipEventType {
+  MANUFACTURED
+  SOLD_TO_RETAILER
+  SOLD_TO_CONSUMER
+  RESOLD
+  DONATED
+  COLLECTED_FOR_RECYCLING
+}
+
+model OwnershipEvent {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  eventType      OwnershipEventType
+  date           DateTime
+  fromEntity     String?
+  toEntity       String?
+  retailerName   String?
+  retailerCnpj   String?
+  consumerIdHash String?
+  price          Float?
+  currency       String  @default("BRL")
+  notes          String?
+
+  createdById String?
+  createdBy   User?  @relation("EventCreator", fields: [createdById], references: [id])
+
+  usageTelemetry Json? // {operatingHours, cycles, energyConsumed, faultCodes}
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+// ============================================================
+// END-OF-LIFE / RECYCLING
+// ============================================================
+
+model EndOfLifeRecord {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  recyclerId   String?
+  recycler     User?  @relation(fields: [recyclerId], references: [id])
+  recyclerName String
+  recyclerCnpj String?
+  recyclerCity String
+
+  collectionDate     DateTime
+  collectionLocation String
+  processingLocation String
+  processingDate     DateTime
+
+  functionalStatus  String // "non-functional", "partially-functional", "functional"
+  cosmeticCondition String // "good", "fair", "poor"
+  isRusted          Boolean @default(false)
+  isDented          Boolean @default(false)
+  isYellowed        Boolean @default(false)
+  isBroken          Boolean @default(false)
+  isDisassembled    Boolean @default(false)
+  isCannibalized    Boolean @default(false)
+  otherConditionNotes String?
+
+  photos Json // string[] - relative paths
+
+  disassemblyReport Json?   // {components, materialsExtracted, hazardousHandled}
+  recyclingRate     Float?  // percentage by weight
+  finalDisposition  String? // "recycled", "refurbished", "landfill"
+  certificateNumber String?
+
+  isRealData Boolean @default(false)
+  dataSource String?
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([recyclerName])
+}

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: dpp-poc
+    runtime: docker
+    plan: free
+    envVars:
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        value: https://dpp-poc.onrender.com
+      - key: DATABASE_URL
+        value: file:./dev.db
