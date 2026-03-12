@@ -40,13 +40,6 @@ export const DEMO_USERS = [
     cnpj: "59.104.760/0001-01",
   },
   {
-    email: "varejista@dpp.br",
-    name: "Carlos Santos",
-    role: "RETAILER" as const,
-    organization: "Magazine Luiza",
-    cnpj: "47.960.950/0001-21",
-  },
-  {
     email: "consumidor@dpp.br",
     name: "Maria Oliveira",
     role: "CONSUMER" as const,
@@ -66,12 +59,5 @@ export const DEMO_USERS = [
     role: "RECYCLER" as const,
     organization: "JG-SUSTENTARE",
     cnpj: "98.765.432/0001-10",
-  },
-  {
-    email: "regulador@dpp.br",
-    name: "Patrícia Rocha",
-    role: "REGULATOR" as const,
-    organization: "INMETRO",
-    cnpj: "00.662.270/0001-55",
   },
 ] as const;

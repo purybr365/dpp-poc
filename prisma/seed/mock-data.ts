@@ -1,5 +1,7 @@
 // Mock product data for upstream lifecycle phases
 
+import { getStandardGTIN } from "../../src/lib/gs1";
+
 interface MockProduct {
   category: "REFRIGERATOR" | "WASHING_MACHINE" | "AIR_CONDITIONER" | "STOVE" | "MICROWAVE";
   brand: string;
@@ -24,11 +26,11 @@ const FACTORIES: Record<string, string[]> = {
 };
 
 const RETAILERS = [
-  { name: "Magazine Luiza", cnpj: "47.960.950/0001-21" },
-  { name: "Casas Bahia", cnpj: "33.041.260/0001-64" },
-  { name: "Ponto (ex-Ponto Frio)", cnpj: "33.041.260/0118-05" },
-  { name: "Americanas", cnpj: "00.776.574/0001-56" },
-  { name: "Amazon Brasil", cnpj: "15.436.940/0001-03" },
+  { name: "Magazine Luiza", cnpj: "47.960.950/0001-21", location: "São Paulo, SP" },
+  { name: "Casas Bahia", cnpj: "33.041.260/0001-64", location: "São Paulo, SP" },
+  { name: "Ponto (ex-Ponto Frio)", cnpj: "33.041.260/0118-05", location: "Curitiba, PR" },
+  { name: "Americanas", cnpj: "00.776.574/0001-56", location: "Belo Horizonte, MG" },
+  { name: "Amazon Brasil", cnpj: "15.436.940/0001-03", location: "São Paulo, SP" },
 ];
 
 const SERVICE_CENTERS = [
@@ -54,17 +56,6 @@ function randomPick<T>(arr: readonly T[]): T {
 
 function randomDate(start: Date, end: Date): Date {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-}
-
-function generateGTIN(): string {
-  // Generate a realistic 13-digit EAN (Brazilian format starts with 789)
-  const prefix = "789";
-  const company = String(randomInt(10000, 99999));
-  const product = String(randomInt(100, 999));
-  const base = prefix + company + product;
-  // Simple check digit
-  const checkDigit = randomInt(0, 9);
-  return base + checkDigit;
 }
 
 function generateBOM(category: string) {
@@ -332,7 +323,7 @@ export function generateMockProducts(): MockProduct[] {
       brand: r.brand,
       model: r.model,
       serialNumber: r.serial,
-      gtin: generateGTIN(),
+      gtin: getStandardGTIN(r.brand, r.model),
       manufacturingDate: randomDate(new Date("2023-01-01"), new Date("2025-06-01")),
       manufacturingFacility: randomPick(FACTORIES[r.brand] || ["Manaus, AM"]),
       batchNumber: `LOT-${randomInt(1000, 9999)}`,
@@ -362,7 +353,7 @@ export function generateMockProducts(): MockProduct[] {
       brand: w.brand,
       model: w.model,
       serialNumber: w.serial,
-      gtin: generateGTIN(),
+      gtin: getStandardGTIN(w.brand, w.model),
       manufacturingDate: randomDate(new Date("2023-06-01"), new Date("2025-03-01")),
       manufacturingFacility: randomPick(FACTORIES[w.brand] || ["Curitiba, PR"]),
       batchNumber: `LOT-${randomInt(1000, 9999)}`,
@@ -394,7 +385,7 @@ export function generateMockProducts(): MockProduct[] {
       brand: ac.brand,
       model: ac.model,
       serialNumber: ac.serial,
-      gtin: generateGTIN(),
+      gtin: getStandardGTIN(ac.brand, ac.model),
       manufacturingDate: randomDate(new Date("2024-01-01"), new Date("2025-09-01")),
       manufacturingFacility: "Manaus, AM",
       batchNumber: `LOT-${randomInt(1000, 9999)}`,
@@ -473,8 +464,7 @@ export function generateOwnershipChain(productId: string, brand: string, stage: 
       toEntity: retailer.name,
       retailerName: retailer.name,
       retailerCnpj: retailer.cnpj,
-      price: randomFloat(800, 5000),
-      currency: "BRL",
+      saleLocation: retailer.location,
     });
 
     if (["IN_USE", "UNDER_REPAIR", "RESOLD", "COLLECTED", "RECYCLED"].includes(stage)) {
@@ -489,8 +479,7 @@ export function generateOwnershipChain(productId: string, brand: string, stage: 
         consumerIdHash: consumerHash,
         retailerName: retailer.name,
         retailerCnpj: retailer.cnpj,
-        price: randomFloat(1200, 6000),
-        currency: "BRL",
+        saleLocation: retailer.location,
         usageTelemetry: {
           operatingHours: randomInt(1000, 15000),
           energyConsumed: randomFloat(200, 2000) + " kWh",

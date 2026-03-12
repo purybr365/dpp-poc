@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
+import { LocaleProvider } from "@/lib/i18n/locale-context";
+import type { Locale } from "@/lib/i18n/translations";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,15 +21,20 @@ export const metadata: Metadata = {
     "Proof of Concept do Passaporte Digital de Produto para eletrodomésticos de linha branca no Brasil",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("locale")?.value as Locale) || "pt-BR";
+
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang={locale === "pt-BR" ? "pt-BR" : locale === "es" ? "es" : "en"} className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased">
-        {children}
+        <LocaleProvider initialLocale={locale}>
+          {children}
+        </LocaleProvider>
       </body>
     </html>
   );

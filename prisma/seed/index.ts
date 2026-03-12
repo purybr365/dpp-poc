@@ -8,6 +8,7 @@ import {
   generateRepairEvents,
   generateOwnershipChain,
 } from "./mock-data";
+import { getStandardGTIN } from "../../src/lib/gs1";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -20,11 +21,9 @@ const DEMO_PASSWORD = "dpp2026";
 
 const DEMO_USERS = [
   { email: "fabricante@dpp.br", name: "Ana Silva", role: "MANUFACTURER" as const, organization: "Brastemp (Whirlpool)", cnpj: "59.104.760/0001-01" },
-  { email: "varejista@dpp.br", name: "Carlos Santos", role: "RETAILER" as const, organization: "Magazine Luiza", cnpj: "47.960.950/0001-21" },
   { email: "consumidor@dpp.br", name: "Maria Oliveira", role: "CONSUMER" as const, organization: null, cnpj: null },
   { email: "tecnico@dpp.br", name: "João Pereira", role: "REPAIR_TECH" as const, organization: "Brastemp Assistência Técnica", cnpj: "12.345.678/0001-90" },
   { email: "reciclador@dpp.br", name: "Roberto Costa", role: "RECYCLER" as const, organization: "JG-SUSTENTARE", cnpj: "98.765.432/0001-10" },
-  { email: "regulador@dpp.br", name: "Patrícia Rocha", role: "REGULATOR" as const, organization: "INMETRO", cnpj: "00.662.270/0001-55" },
 ];
 
 function generateUID(gtin: string | null, serial: string): string {
@@ -124,7 +123,7 @@ async function seedRealProducts() {
   const manufacturerUser = await prisma.user.findFirst({ where: { role: "MANUFACTURER" } });
 
   for (const rp of ALL_REAL_PRODUCTS) {
-    const gtin = `789${Math.floor(Math.random() * 100000000).toString().padStart(8, "0")}0`;
+    const gtin = getStandardGTIN(rp.brand, rp.model);
     const uid = generateUID(gtin, rp.serialNumber);
 
     // Generate mock upstream data for real recycled products

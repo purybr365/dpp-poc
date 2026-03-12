@@ -1,20 +1,30 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { LIFECYCLE_STAGES } from "@/lib/constants";
+import { buildGS1Path } from "@/lib/gs1";
 
 interface ProductHeroProps {
   product: Record<string, unknown>;
   category?: { pt: string; en: string; icon: string };
   productId?: string;
+  gtin?: string;
+  serialNumber?: string;
 }
 
-export function ProductHero({ product, category, productId }: ProductHeroProps) {
+export function ProductHero({ product, category, productId, gtin, serialNumber }: ProductHeroProps) {
   const stage = LIFECYCLE_STAGES[product.lifecycleStage as keyof typeof LIFECYCLE_STAGES];
   const mfgDate = product.manufacturingDate
     ? new Date(product.manufacturingDate as string).toLocaleDateString("pt-BR")
     : "N/A";
 
   const manufacturer = product.manufacturer as { name: string; organization: string } | null;
+
+  // Build QR code URL - use GS1 path if gtin+serial available
+  const qrUrl = gtin && serialNumber
+    ? `/api/products/${productId}/qr-code?format=svg&gtin=${gtin}&serial=${serialNumber}`
+    : productId
+    ? `/api/products/${productId}/qr-code?format=svg`
+    : null;
 
   return (
     <Card className="overflow-hidden">
@@ -80,11 +90,11 @@ export function ProductHero({ product, category, productId }: ProductHeroProps) 
           </div>
 
           {/* QR Code */}
-          {productId && (
+          {qrUrl && (
             <div className="flex-shrink-0 flex flex-col items-center gap-1 md:self-start self-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`/api/products/${productId}/qr-code?format=svg`}
+                src={qrUrl}
                 alt="QR Code do Passaporte Digital"
                 width={120}
                 height={120}

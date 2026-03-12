@@ -7,66 +7,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import type { TKey } from "@/lib/i18n/translations";
 
 const ROLE_CARDS = [
   {
     email: "fabricante@dpp.br",
     name: "Ana Silva",
-    role: "Fabricante",
+    role: "MANUFACTURER",
     organization: "Brastemp (Whirlpool)",
     icon: "🏭",
     color: "bg-blue-50 border-blue-200 hover:border-blue-400",
-    description: "Cria passaportes, gerencia produção",
-  },
-  {
-    email: "varejista@dpp.br",
-    name: "Carlos Santos",
-    role: "Varejista",
-    organization: "Magazine Luiza",
-    icon: "🏬",
-    color: "bg-purple-50 border-purple-200 hover:border-purple-400",
-    description: "Registra vendas, rastreia estoque",
   },
   {
     email: "consumidor@dpp.br",
     name: "Maria Oliveira",
-    role: "Consumidor",
+    role: "CONSUMER",
     organization: "Pessoa Física",
     icon: "👤",
     color: "bg-green-50 border-green-200 hover:border-green-400",
-    description: "Consulta produto, manual, garantia",
   },
   {
     email: "tecnico@dpp.br",
     name: "João Pereira",
-    role: "Técnico de Reparo",
+    role: "REPAIR_TECH",
     organization: "Brastemp Assistência",
     icon: "🔧",
     color: "bg-orange-50 border-orange-200 hover:border-orange-400",
-    description: "Registra reparos, consulta peças",
   },
   {
     email: "reciclador@dpp.br",
     name: "Roberto Costa",
-    role: "Reciclador",
+    role: "RECYCLER",
     organization: "JG-SUSTENTARE",
     icon: "♻️",
     color: "bg-emerald-50 border-emerald-200 hover:border-emerald-400",
-    description: "Registra fim de vida, desmontagem",
-  },
-  {
-    email: "regulador@dpp.br",
-    name: "Patrícia Rocha",
-    role: "Regulador",
-    organization: "INMETRO",
-    icon: "🏛️",
-    color: "bg-red-50 border-red-200 hover:border-red-400",
-    description: "Acesso completo, auditorias",
   },
 ];
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showManual, setShowManual] = useState(false);
@@ -84,7 +66,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("Erro ao fazer login. Tente novamente.");
+      setError(t("login.error"));
       setLoading(null);
     } else {
       router.push("/");
@@ -104,7 +86,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("Email ou senha inválidos.");
+      setError(t("login.invalidCredentials"));
       setLoading(null);
     } else {
       router.push("/");
@@ -119,29 +101,32 @@ export default function LoginPage() {
         <div className="flex items-center justify-center gap-3 mb-2">
           <span className="text-4xl">📋</span>
           <h1 className="text-3xl font-bold text-slate-900">
-            DPP Brasil
+            {t("login.title")}
           </h1>
         </div>
         <p className="text-lg text-slate-600">
-          Passaporte Digital de Produto — Linha Branca
+          {t("login.subtitle")}
         </p>
         <p className="text-sm text-slate-400 mt-1">
-          Proof of Concept • ESPR / CIRPASS alignment
+          {t("login.poc")}
         </p>
+        <div className="flex justify-center mt-3">
+          <LanguageSwitcher />
+        </div>
       </header>
 
       {/* Role Selector */}
-      <main className="flex-1 max-w-5xl mx-auto px-4 pb-12 w-full">
+      <main className="flex-1 max-w-4xl mx-auto px-4 pb-12 w-full">
         <div className="text-center mb-8">
           <h2 className="text-xl font-semibold text-slate-700 mb-1">
-            Selecione um perfil para entrar
+            {t("login.selectProfile")}
           </h2>
           <p className="text-sm text-slate-500">
-            Cada perfil tem uma visão diferente do passaporte digital
+            {t("login.profileDescription")}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {ROLE_CARDS.map((card) => (
             <Card
               key={card.email}
@@ -154,7 +139,9 @@ export default function LoginPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{card.icon}</span>
                   <div>
-                    <CardTitle className="text-base">{card.role}</CardTitle>
+                    <CardTitle className="text-base">
+                      {t(`role.${card.role}` as TKey)}
+                    </CardTitle>
                     <CardDescription className="text-xs">
                       {card.organization}
                     </CardDescription>
@@ -162,16 +149,18 @@ export default function LoginPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-slate-600 mb-2">{card.description}</p>
+                <p className="text-sm text-slate-600 mb-2">
+                  {t(`roleDesc.${card.role}` as TKey)}
+                </p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">{card.name}</span>
                   {loading === card.email ? (
                     <span className="text-xs text-slate-500 animate-pulse">
-                      Entrando...
+                      {t("login.entering")}
                     </span>
                   ) : (
                     <Button variant="ghost" size="sm" className="text-xs h-7">
-                      Entrar →
+                      {t("login.enter")}
                     </Button>
                   )}
                 </div>
@@ -190,23 +179,23 @@ export default function LoginPage() {
             onClick={() => setShowManual(!showManual)}
             className="text-sm text-slate-400 hover:text-slate-600 underline"
           >
-            {showManual ? "Ocultar login manual" : "Ou faça login com email e senha"}
+            {showManual ? t("login.hideManual") : t("login.manualLogin")}
           </button>
         </div>
 
         {showManual && (
           <Card className="max-w-sm mx-auto mt-4">
             <CardHeader>
-              <CardTitle className="text-base">Login Manual</CardTitle>
+              <CardTitle className="text-base">{t("login.manualTitle")}</CardTitle>
               <CardDescription className="text-xs">
-                Senha padrão: dpp2026
+                {t("login.manualDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleManualLogin} className="space-y-3">
                 <div>
                   <Label htmlFor="email" className="text-sm">
-                    Email
+                    {t("login.email")}
                   </Label>
                   <Input
                     id="email"
@@ -219,7 +208,7 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <Label htmlFor="password" className="text-sm">
-                    Senha
+                    {t("login.password")}
                   </Label>
                   <Input
                     id="password"
@@ -235,7 +224,7 @@ export default function LoginPage() {
                   className="w-full"
                   disabled={loading === "manual"}
                 >
-                  {loading === "manual" ? "Entrando..." : "Entrar"}
+                  {loading === "manual" ? t("login.entering") : t("login.submit")}
                 </Button>
               </form>
             </CardContent>
@@ -245,8 +234,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-slate-400 border-t">
-        DPP Brasil POC • Dados reais de recicladores: JG-SUSTENTARE, WK
-        Solutions, Greentech
+        {t("footer.text")}
       </footer>
     </div>
   );

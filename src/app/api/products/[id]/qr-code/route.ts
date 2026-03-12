@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
+import { buildGS1Path } from "@/lib/gs1";
 
 export async function GET(
   request: NextRequest,
@@ -10,7 +11,7 @@ export async function GET(
 
   const product = await prisma.product.findUnique({
     where: { id },
-    select: { id: true, uid: true, brand: true, model: true },
+    select: { id: true, uid: true, brand: true, model: true, gtin: true, serialNumber: true },
   });
 
   if (!product) {
@@ -19,7 +20,12 @@ export async function GET(
 
   const format = request.nextUrl.searchParams.get("format") || "svg";
   const baseUrl = request.nextUrl.origin;
-  const passportUrl = `${baseUrl}/passport/${product.id}`;
+
+  // Use GS1 Digital Link URL if gtin is available
+  const passportPath = product.gtin
+    ? buildGS1Path(product.gtin, product.serialNumber)
+    : `/passport/${product.id}`;
+  const passportUrl = `${baseUrl}${passportPath}`;
 
   if (format === "png") {
     const buffer = await QRCode.toBuffer(passportUrl, {

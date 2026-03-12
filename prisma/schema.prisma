@@ -150,6 +150,7 @@ model OwnershipEvent {
   toEntity       String?
   retailerName   String?
   retailerCnpj   String?
+  saleLocation   String?
   consumerIdHash String?
   price          Float?
   currency       String  @default("BRL")
