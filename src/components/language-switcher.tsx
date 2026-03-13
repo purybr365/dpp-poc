@@ -12,14 +12,14 @@ export function LanguageSwitcher() {
         <button
           key={loc}
           onClick={() => setLocale(loc)}
-          className={`text-xs px-2 py-0.5 rounded transition-colors ${
+          className={`text-base px-1.5 py-0.5 rounded transition-colors ${
             locale === loc
               ? "bg-slate-900 text-white"
               : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
           }`}
           title={name}
         >
-          {loc === "pt-BR" ? "PT" : loc === "en" ? "EN" : "ES"}
+          {loc === "pt-BR" ? "\u{1F1E7}\u{1F1F7}" : loc === "en" ? "\u{1F1FA}\u{1F1F8}" : "\u{1F1EA}\u{1F1F8}"}
         </button>
       ))}
     </div>

@@ -29,6 +29,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV DATABASE_URL="file:./dev.db"
+ENV NEXT_PUBLIC_BASE_URL="https://dpp-poc-1.onrender.com"
 
 # Copy standalone output + static files + public assets + db
 COPY --from=builder /app/.next/standalone ./

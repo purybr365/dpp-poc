@@ -122,7 +122,7 @@ export default async function PassportGS1Page({
         <LifecycleTimeline currentStage={product.lifecycleStage} />
 
         <Tabs defaultValue={visibleSections[0]} className="w-full">
-          <TabsList className="flex flex-wrap h-auto gap-1 bg-transparent p-0 mb-4">
+          <TabsList className="flex flex-wrap h-auto gap-1 bg-transparent p-0 mb-8">
             {visibleSections.map((key) => (
               <TabsTrigger
                 key={key}

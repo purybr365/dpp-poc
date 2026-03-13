@@ -19,7 +19,7 @@ export async function GET(
   }
 
   const format = request.nextUrl.searchParams.get("format") || "svg";
-  const baseUrl = request.nextUrl.origin;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
 
   // Use GS1 Digital Link URL if gtin is available
   const passportPath = product.gtin

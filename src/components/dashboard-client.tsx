@@ -271,7 +271,7 @@ export function DashboardClient({ products, role, userName, userOrganization, st
                           locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR"
                         )}
                       </p>
-                      <p className="text-slate-400">
+                      <p className="text-green-600 font-medium">
                         {t("dashboard.productAge")}: {age}
                       </p>
                     </div>

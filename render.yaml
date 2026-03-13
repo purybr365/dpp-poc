@@ -8,5 +8,7 @@ services:
         generateValue: true
       - key: NEXTAUTH_URL
         value: https://dpp-poc.onrender.com
+      - key: NEXT_PUBLIC_BASE_URL
+        value: https://dpp-poc-1.onrender.com
       - key: DATABASE_URL
         value: file:./dev.db
