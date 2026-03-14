@@ -7,21 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useLocale } from "@/lib/i18n/locale-context";
+import type { TKey } from "@/lib/i18n/translations";
 
-const CATEGORIES = [
-  { value: "REFRIGERATOR", label: "Geladeira" },
-  { value: "WASHING_MACHINE", label: "Máquina de Lavar" },
-  { value: "AIR_CONDITIONER", label: "Ar Condicionado" },
-  { value: "STOVE", label: "Fogão" },
-  { value: "MICROWAVE", label: "Micro-ondas" },
-  { value: "DRYER", label: "Secadora" },
-  { value: "DISHWASHER", label: "Lava-louça" },
-];
+const CATEGORY_KEYS = [
+  "REFRIGERATOR",
+  "WASHING_MACHINE",
+  "AIR_CONDITIONER",
+  "STOVE",
+  "MICROWAVE",
+  "DRYER",
+  "DISHWASHER",
+] as const;
 
 const ENERGY_CLASSES = ["A", "B", "C", "D", "E", "F", "G"];
 
 export default function NewProductForm() {
   const router = useRouter();
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -79,7 +82,7 @@ export default function NewProductForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Erro ao criar produto");
+        throw new Error(data.error || t("form.newProduct.error"));
       }
 
       const product = await res.json();
@@ -95,49 +98,49 @@ export default function NewProductForm() {
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80">
           <span className="text-2xl">📋</span>
-          <span className="font-bold text-lg text-slate-900">DPP Brasil</span>
+          <span className="font-bold text-lg text-slate-900">{t("nav.title")}</span>
         </Link>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-slate-900 mb-6">
-          Novo Passaporte de Produto
+          {t("form.newProduct.title")}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Info */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Identificação do Produto</CardTitle>
+              <CardTitle className="text-base">{t("form.newProduct.identification")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="brand">Marca *</Label>
+                  <Label htmlFor="brand">{t("form.newProduct.brand")} *</Label>
                   <Input id="brand" name="brand" required placeholder="Brastemp" />
                 </div>
                 <div>
-                  <Label htmlFor="model">Modelo *</Label>
+                  <Label htmlFor="model">{t("form.newProduct.model")} *</Label>
                   <Input id="model" name="model" required placeholder="BRM56AB" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="serialNumber">Número de Série *</Label>
+                  <Label htmlFor="serialNumber">{t("form.newProduct.serialNumber")} *</Label>
                   <Input id="serialNumber" name="serialNumber" required placeholder="SN-001234" />
                 </div>
                 <div>
-                  <Label htmlFor="category">Categoria *</Label>
+                  <Label htmlFor="category">{t("form.newProduct.category")} *</Label>
                   <select
                     id="category"
                     name="category"
                     required
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
+                    {CATEGORY_KEYS.map((key) => (
+                      <option key={key} value={key}>
+                        {t(`category.${key}` as TKey)}
                       </option>
                     ))}
                   </select>
@@ -150,7 +153,7 @@ export default function NewProductForm() {
                   <Input id="gtin" name="gtin" placeholder="7891234567890" />
                 </div>
                 <div>
-                  <Label htmlFor="productCode">Código do Produto</Label>
+                  <Label htmlFor="productCode">{t("form.newProduct.productCode")}</Label>
                   <Input id="productCode" name="productCode" placeholder="BRM56ABANA" />
                 </div>
               </div>
@@ -160,16 +163,16 @@ export default function NewProductForm() {
           {/* Manufacturing */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Fabricação</CardTitle>
+              <CardTitle className="text-base">{t("form.newProduct.manufacturing")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="manufacturingDate">Data de Fabricação *</Label>
+                  <Label htmlFor="manufacturingDate">{t("form.newProduct.manufacturingDate")} *</Label>
                   <Input id="manufacturingDate" name="manufacturingDate" type="date" required />
                 </div>
                 <div>
-                  <Label htmlFor="manufacturingFacility">Fábrica *</Label>
+                  <Label htmlFor="manufacturingFacility">{t("form.newProduct.factory")} *</Label>
                   <Input
                     id="manufacturingFacility"
                     name="manufacturingFacility"
@@ -180,11 +183,11 @@ export default function NewProductForm() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="batchNumber">Lote</Label>
+                  <Label htmlFor="batchNumber">{t("form.newProduct.batch")}</Label>
                   <Input id="batchNumber" name="batchNumber" placeholder="LOT-2024-001" />
                 </div>
                 <div>
-                  <Label htmlFor="legalName">Razão Social</Label>
+                  <Label htmlFor="legalName">{t("form.newProduct.legalName")}</Label>
                   <Input id="legalName" name="legalName" placeholder="Whirlpool S.A." />
                 </div>
               </div>
@@ -194,12 +197,12 @@ export default function NewProductForm() {
           {/* Environmental */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Dados Ambientais</CardTitle>
+              <CardTitle className="text-base">{t("form.newProduct.environmental")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="energyClass">Classe Energética</Label>
+                  <Label htmlFor="energyClass">{t("form.newProduct.energyClass")}</Label>
                   <select
                     id="energyClass"
                     name="energyClass"
@@ -213,25 +216,25 @@ export default function NewProductForm() {
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="energyConsumption">Consumo (kWh/ano)</Label>
+                  <Label htmlFor="energyConsumption">{t("form.newProduct.energyConsumption")}</Label>
                   <Input id="energyConsumption" name="energyConsumption" type="number" placeholder="350" />
                 </div>
                 <div>
-                  <Label htmlFor="carbonFootprint">CO2e (kg)</Label>
+                  <Label htmlFor="carbonFootprint">{t("form.newProduct.co2")}</Label>
                   <Input id="carbonFootprint" name="carbonFootprint" type="number" placeholder="400" />
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="weight">Peso (kg)</Label>
+                  <Label htmlFor="weight">{t("form.newProduct.weight")}</Label>
                   <Input id="weight" name="weight" type="number" placeholder="65" />
                 </div>
                 <div>
-                  <Label htmlFor="recyclabilityRate">Reciclabilidade (%)</Label>
+                  <Label htmlFor="recyclabilityRate">{t("form.newProduct.recyclability")}</Label>
                   <Input id="recyclabilityRate" name="recyclabilityRate" type="number" placeholder="80" />
                 </div>
                 <div>
-                  <Label htmlFor="materials">Materiais (separados por vírgula)</Label>
+                  <Label htmlFor="materials">{t("form.newProduct.materials")}</Label>
                   <Input id="materials" name="materials" placeholder="Aço, Plástico, Cobre" />
                 </div>
               </div>
@@ -241,16 +244,16 @@ export default function NewProductForm() {
           {/* Support */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Suporte</CardTitle>
+              <CardTitle className="text-base">{t("form.newProduct.support")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="warrantyDuration">Garantia</Label>
+                  <Label htmlFor="warrantyDuration">{t("form.newProduct.warranty")}</Label>
                   <Input id="warrantyDuration" name="warrantyDuration" placeholder="12 meses" />
                 </div>
                 <div>
-                  <Label htmlFor="sacNumber">SAC</Label>
+                  <Label htmlFor="sacNumber">{t("form.newProduct.sac")}</Label>
                   <Input id="sacNumber" name="sacNumber" placeholder="0800-970-0999" />
                 </div>
               </div>
@@ -265,11 +268,11 @@ export default function NewProductForm() {
 
           <div className="flex gap-3">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? "Criando..." : "Criar Passaporte Digital"}
+              {loading ? t("form.newProduct.creating") : t("form.newProduct.submit")}
             </Button>
             <Link href="/">
               <Button variant="outline" type="button">
-                Cancelar
+                {t("form.cancel")}
               </Button>
             </Link>
           </div>

@@ -1,4 +1,8 @@
+"use client";
+
 import { LIFECYCLE_STAGES } from "@/lib/constants";
+import { useLocale } from "@/lib/i18n/locale-context";
+import type { TKey } from "@/lib/i18n/translations";
 
 interface LifecycleTimelineProps {
   currentStage: string;
@@ -27,16 +31,18 @@ const STAGE_ICONS: Record<string, string> = {
 };
 
 export function LifecycleTimeline({ currentStage }: LifecycleTimelineProps) {
+  const { t, locale } = useLocale();
   const currentIndex = STAGE_ORDER.indexOf(currentStage as typeof STAGE_ORDER[number]);
 
   return (
     <div className="w-full">
-      <h3 className="text-sm font-semibold text-slate-600 mb-3">Ciclo de Vida</h3>
+      <h3 className="text-sm font-semibold text-slate-600 mb-3">{t("lifecycle.title")}</h3>
       <div className="flex items-center overflow-x-auto pb-2 gap-0">
         {STAGE_ORDER.map((stage, idx) => {
           const stageInfo = LIFECYCLE_STAGES[stage];
           const isPast = idx <= currentIndex;
           const isCurrent = idx === currentIndex;
+          const stageLabel = t(`lifecycle.${stage}` as TKey);
 
           return (
             <div key={stage} className="flex items-center flex-shrink-0">
@@ -57,7 +63,7 @@ export function LifecycleTimeline({ currentStage }: LifecycleTimelineProps) {
                     isCurrent ? "font-bold text-slate-900" : isPast ? "text-emerald-600" : "text-slate-400"
                   }`}
                 >
-                  {stageInfo.pt}
+                  {stageLabel}
                 </span>
               </div>
               {idx < STAGE_ORDER.length - 1 && (

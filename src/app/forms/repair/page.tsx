@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 interface PartReplaced {
   name: string;
@@ -25,6 +26,7 @@ function RepairForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [parts, setParts] = useState<PartReplaced[]>([]);
@@ -33,9 +35,9 @@ function RepairForm() {
 
   useEffect(() => {
     if (!productId) {
-      setError("ID do produto não fornecido. Volte e selecione um produto.");
+      setError(t("form.repair.missingProduct"));
     }
-  }, [productId]);
+  }, [productId, t]);
 
   function addPart() {
     if (partName.trim()) {
@@ -76,7 +78,7 @@ function RepairForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Erro ao registrar reparo");
+        throw new Error(data.error || t("form.repair.error"));
       }
 
       router.push(`/passport/${productId}`);
@@ -91,24 +93,24 @@ function RepairForm() {
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80">
           <span className="text-2xl">📋</span>
-          <span className="font-bold text-lg text-slate-900">DPP Brasil</span>
+          <span className="font-bold text-lg text-slate-900">{t("nav.title")}</span>
         </Link>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-slate-900 mb-6">
-          Registrar Reparo
+          {t("form.repair.title")}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Dados do Reparo</CardTitle>
+              <CardTitle className="text-base">{t("form.repair.data")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="date">Data do Reparo *</Label>
+                  <Label htmlFor="date">{t("form.repair.date")} *</Label>
                   <Input
                     id="date"
                     name="date"
@@ -118,47 +120,47 @@ function RepairForm() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="postRepairStatus">Status Pós-Reparo</Label>
+                  <Label htmlFor="postRepairStatus">{t("form.repair.postStatus")}</Label>
                   <select
                     id="postRepairStatus"
                     name="postRepairStatus"
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    <option value="passed">Aprovado</option>
-                    <option value="needs_followup">Precisa Acompanhamento</option>
-                    <option value="failed">Falhou</option>
+                    <option value="passed">{t("condition.passed")}</option>
+                    <option value="needs_followup">{t("condition.needsFollowup")}</option>
+                    <option value="failed">{t("condition.failed")}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="issueDescription">Descrição do Problema *</Label>
+                <Label htmlFor="issueDescription">{t("form.repair.issueDescription")} *</Label>
                 <textarea
                   id="issueDescription"
                   name="issueDescription"
                   required
-                  placeholder="Descreva o problema encontrado..."
+                  placeholder={t("form.repair.issuePlaceholder")}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="laborCost">Custo da Mão de Obra (R$)</Label>
+                  <Label htmlFor="laborCost">{t("form.repair.laborCost")}</Label>
                   <Input id="laborCost" name="laborCost" type="number" step="0.01" placeholder="150.00" />
                 </div>
                 <div>
-                  <Label htmlFor="totalCost">Custo Total (R$)</Label>
+                  <Label htmlFor="totalCost">{t("form.repair.totalCost")}</Label>
                   <Input id="totalCost" name="totalCost" type="number" step="0.01" placeholder="350.00" />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="notes">Observações</Label>
+                <Label htmlFor="notes">{t("form.repair.notes")}</Label>
                 <textarea
                   id="notes"
                   name="notes"
-                  placeholder="Notas adicionais..."
+                  placeholder={t("form.repair.notesPlaceholder")}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[60px]"
                 />
               </div>
@@ -168,18 +170,18 @@ function RepairForm() {
           {/* Parts Replaced */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Peças Substituídas</CardTitle>
+              <CardTitle className="text-base">{t("form.repair.partsReplaced")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Input
-                  placeholder="Nome da peça"
+                  placeholder={t("form.repair.partName")}
                   value={partName}
                   onChange={(e) => setPartName(e.target.value)}
                   className="flex-1"
                 />
                 <Input
-                  placeholder="Custo (R$)"
+                  placeholder={t("form.repair.partCost")}
                   value={partCost}
                   onChange={(e) => setPartCost(e.target.value)}
                   type="number"
@@ -187,7 +189,7 @@ function RepairForm() {
                   className="w-32"
                 />
                 <Button type="button" variant="outline" onClick={addPart}>
-                  Adicionar
+                  {t("form.repair.addPart")}
                 </Button>
               </div>
 
@@ -225,11 +227,11 @@ function RepairForm() {
 
           <div className="flex gap-3">
             <Button type="submit" disabled={loading || !productId} className="flex-1">
-              {loading ? "Registrando..." : "Registrar Reparo"}
+              {loading ? t("form.repair.submitting") : t("form.repair.submit")}
             </Button>
             <Link href="/">
               <Button variant="outline" type="button">
-                Cancelar
+                {t("form.cancel")}
               </Button>
             </Link>
           </div>

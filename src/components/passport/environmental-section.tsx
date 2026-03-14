@@ -90,7 +90,7 @@ export function EnvironmentalSection({ data, accessLevel }: EnvironmentalSection
               </div>
               <div className="ml-4">
                 <span className="text-4xl font-bold text-slate-900">{energyClass}</span>
-                <p className="text-xs text-slate-400">Selo Procel</p>
+                <p className="text-xs text-slate-400">{t("env.procelLabel")}</p>
               </div>
             </div>
           </div>

@@ -1,30 +1,35 @@
+"use client";
+
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useLocale } from "@/lib/i18n/locale-context";
+import type { TKey } from "@/lib/i18n/translations";
 
 export default function AboutPage() {
+  const { t } = useLocale();
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Nav */}
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80">
           <span className="text-2xl">📋</span>
-          <span className="font-bold text-lg text-slate-900">DPP Brasil</span>
+          <span className="font-bold text-lg text-slate-900">{t("nav.title")}</span>
         </Link>
         <Badge variant="secondary" className="text-xs">
-          Documentação da Arquitetura
+          {t("about.archDocs")}
         </Badge>
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Sobre o DPP Brasil
+            {t("about.title")}
           </h1>
           <p className="text-slate-500 text-lg">
-            Arquitetura e decisões de design do Passaporte Digital de Produto
-            para eletrodomésticos de linha branca.
+            {t("about.subtitle")}
           </p>
         </div>
 
@@ -32,7 +37,7 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              🔑 Identificação de Produto & Formato URN
+              🔑 {t("about.urnTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -48,8 +53,7 @@ export default function AboutPage() {
                 <span className="text-xs text-slate-400 block mb-1">Namespace</span>
                 <code className="text-sm font-mono text-slate-700">urn:dpp:br</code>
                 <p className="text-xs text-slate-500 mt-1">
-                  Identificador URN para Passaportes Digitais de Produto brasileiros.
-                  Segue o padrão de namespaces URN (RFC 8141).
+                  {t("about.urnNamespace")}
                 </p>
               </div>
               <div className="border rounded-lg p-3">
@@ -58,24 +62,20 @@ export default function AboutPage() {
                 </span>
                 <code className="text-sm font-mono text-blue-600">789786730430</code>
                 <p className="text-xs text-slate-500 mt-1">
-                  Global Trade Item Number (GS1). O prefixo <code>789</code> identifica o Brasil.
-                  No POC, GTINs são gerados sinteticamente. Em produção, seriam emitidos pela GS1 Brasil.
+                  {t("about.urnGtin")}
                 </p>
               </div>
               <div className="border rounded-lg p-3">
-                <span className="text-xs text-slate-400 block mb-1">Número de Série</span>
+                <span className="text-xs text-slate-400 block mb-1">{t("about.urnSerialLabel")}</span>
                 <code className="text-sm font-mono text-emerald-600">6AB339440</code>
                 <p className="text-xs text-slate-500 mt-1">
-                  Serial de fábrica do produto individual. Nos 11 produtos reais
-                  do POC, estes são números reais de série coletados nas recicladoras.
+                  {t("about.urnSerial")}
                 </p>
               </div>
               <div className="border rounded-lg p-3">
-                <span className="text-xs text-slate-400 block mb-1">Em Produção</span>
+                <span className="text-xs text-slate-400 block mb-1">{t("about.urnProduction")}</span>
                 <p className="text-xs text-slate-500">
-                  O GTIN viria da GS1 Brasil; o serial é o número da linha de produção
-                  do fabricante. Sem necessidade de aprovação central — similar ao modelo GS1,
-                  onde o fabricante auto-atribui dentro do seu prefixo.
+                  {t("about.urnProductionDesc")}
                 </p>
               </div>
             </div>
@@ -86,37 +86,35 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              🏭 Modelo de Registro pelo Fabricante
+              🏭 {t("about.mfgRegTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-slate-600">
-              Fabricantes registram produtos no <strong>nível do número de série</strong> —
-              cada unidade individual recebe um DPP próprio. Não há aprovação prévia ou
-              controle centralizado.
+              {t("about.mfgRegDesc")}
             </p>
 
             <div className="bg-slate-50 rounded-lg p-4">
-              <span className="text-xs text-slate-400 block mb-3">Analogia GS1</span>
+              <span className="text-xs text-slate-400 block mb-3">{t("about.mfgRegAnalogy")}</span>
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="bg-white border rounded px-3 py-2 text-center">
                   <span className="text-xs text-slate-400 block">GS1 Brasil</span>
-                  <span className="text-sm font-medium">Prefixo da Empresa</span>
+                  <span className="text-sm font-medium">{t("about.mfgRegCompanyPrefix")}</span>
                 </div>
                 <span className="text-slate-300">→</span>
                 <div className="bg-white border rounded px-3 py-2 text-center">
-                  <span className="text-xs text-slate-400 block">Fabricante</span>
-                  <span className="text-sm font-medium">Código do Produto</span>
+                  <span className="text-xs text-slate-400 block">{t("passport.manufacturer")}</span>
+                  <span className="text-sm font-medium">{t("about.mfgRegProductCode")}</span>
                 </div>
                 <span className="text-slate-300">→</span>
                 <div className="bg-white border rounded px-3 py-2 text-center">
-                  <span className="text-xs text-slate-400 block">Fabricante</span>
-                  <span className="text-sm font-medium">Número de Série</span>
+                  <span className="text-xs text-slate-400 block">{t("passport.manufacturer")}</span>
+                  <span className="text-sm font-medium">{t("about.mfgRegSerialNumber")}</span>
                 </div>
                 <span className="text-slate-300">=</span>
                 <div className="bg-blue-50 border-blue-200 border rounded px-3 py-2 text-center">
                   <span className="text-xs text-blue-400 block">DPP</span>
-                  <span className="text-sm font-semibold text-blue-700">UID Único</span>
+                  <span className="text-sm font-semibold text-blue-700">{t("about.mfgRegUniqueUid")}</span>
                 </div>
               </div>
             </div>
@@ -124,27 +122,19 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
-                <span className="text-slate-600">
-                  Registro por serial — cada unidade tem seu próprio passaporte
-                </span>
+                <span className="text-slate-600">{t("about.mfgRegBullet1")}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
-                <span className="text-slate-600">
-                  Sem aprovação prévia — fabricante auto-registra
-                </span>
+                <span className="text-slate-600">{t("about.mfgRegBullet2")}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
-                <span className="text-slate-600">
-                  GTIN opcional no POC (gerado automaticamente se omitido)
-                </span>
+                <span className="text-slate-600">{t("about.mfgRegBullet3")}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-amber-500 mt-0.5">◆</span>
-                <span className="text-slate-600">
-                  Em produção: GTIN obrigatório via GS1 Brasil
-                </span>
+                <span className="text-slate-600">{t("about.mfgRegBullet4")}</span>
               </div>
             </div>
           </CardContent>
@@ -154,19 +144,18 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              📊 Fontes de Dados
+              📊 {t("about.dataSourcesTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="border rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge className="bg-green-100 text-green-700 text-xs">Dados Reais</Badge>
-                  <span className="text-sm font-semibold">11 produtos</span>
+                  <Badge className="bg-green-100 text-green-700 text-xs">{t("about.realData")}</Badge>
+                  <span className="text-sm font-semibold">{t("about.realDataProducts")}</span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Registros de fim de vida de 3 recicladoras com números de série
-                  reais, condições e fotos transcritos de PDFs e planilhas Excel.
+                  {t("about.realDataDesc")}
                 </p>
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-slate-400">• JG-SUSTENTARE (Alvorada, RS)</p>
@@ -177,24 +166,20 @@ export default function AboutPage() {
 
               <div className="border rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge className="bg-blue-100 text-blue-700 text-xs">Dados Mock</Badge>
-                  <span className="text-sm font-semibold">10 produtos</span>
+                  <Badge className="bg-blue-100 text-blue-700 text-xs">{t("about.mockData")}</Badge>
+                  <span className="text-sm font-semibold">{t("about.mockDataProducts")}</span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Dados de ciclo de vida upstream (fabricação, cadeia de suprimentos,
-                  dados ambientais, regulatórios) gerados programaticamente com
-                  faixas realistas.
+                  {t("about.mockDataDesc")}
                 </p>
               </div>
 
               <div className="border rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge className="bg-purple-100 text-purple-700 text-xs">Híbrido</Badge>
+                  <Badge className="bg-purple-100 text-purple-700 text-xs">{t("about.hybridData")}</Badge>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Produtos reais reciclados recebem dados upstream sintéticos
-                  (datas de fabricação, métricas ambientais) para demonstrar
-                  um ciclo de vida completo no passaporte.
+                  {t("about.hybridDataDesc")}
                 </p>
               </div>
             </div>
@@ -205,18 +190,17 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              ♻️ Taxa de Reciclagem
+              ♻️ {t("about.recyclingRateTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="border border-amber-200 bg-amber-50 rounded-lg p-3">
                 <span className="text-xs text-amber-600 font-medium block mb-1">
-                  Neste POC
+                  {t("about.recyclingRatePocLabel")}
                 </span>
                 <p className="text-sm text-slate-700">
-                  Gerada aleatoriamente entre <strong>75% e 90%</strong> por peso.
-                  Valor ilustrativo baseado em faixas típicas do setor de linha branca.
+                  {t("about.recyclingRatePocDesc")}
                 </p>
                 <code className="text-xs text-slate-400 mt-2 block font-mono">
                   75 + Math.random() × 15
@@ -225,17 +209,16 @@ export default function AboutPage() {
 
               <div className="border border-emerald-200 bg-emerald-50 rounded-lg p-3">
                 <span className="text-xs text-emerald-600 font-medium block mb-1">
-                  Em Produção
+                  {t("about.recyclingRateProdLabel")}
                 </span>
                 <p className="text-sm text-slate-700">
-                  Calculada automaticamente a partir do relatório de desmontagem:
+                  {t("about.recyclingRateProdDesc")}
                 </p>
                 <div className="bg-white rounded p-2 mt-2 text-xs font-mono text-center">
                   taxa = (Σ materiais extraídos) ÷ peso total × 100
                 </div>
                 <p className="text-xs text-slate-500 mt-2">
-                  O relatório já contém <code>materialsExtracted</code> (metais, plásticos,
-                  cobre, vidro em kg) e a cadeia de suprimentos tem <code>totalWeight</code>.
+                  {t("about.recyclingRateProdFormula")}
                 </p>
               </div>
             </div>
@@ -246,20 +229,19 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              🔒 Privacidade do Consumidor (LGPD)
+              🔒 {t("about.privacyTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-slate-600">
-              O DPP registra transferências de propriedade mas anonimiza consumidores
-              via hash unidirecional, em conformidade com a LGPD.
+              {t("about.privacyDesc")}
             </p>
 
             <div className="bg-slate-50 rounded-lg p-4">
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="bg-white border rounded px-3 py-2 text-center">
-                  <span className="text-xs text-slate-400 block">Sistema do Varejista</span>
-                  <span className="text-sm">CPF, Nome, Endereço</span>
+                  <span className="text-xs text-slate-400 block">{t("about.privacyRetailerSystem")}</span>
+                  <span className="text-sm">{t("about.privacyRetailerData")}</span>
                 </div>
                 <span className="text-slate-300">→</span>
                 <div className="bg-white border rounded px-3 py-2 text-center">
@@ -278,26 +260,20 @@ export default function AboutPage() {
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
                 <span className="text-slate-600">
-                  <strong>consumerIdHash</strong> — identificador anônimo de 8 caracteres
+                  <strong>consumerIdHash</strong> — {t("about.privacyBullet1").replace("consumerIdHash — ", "")}
                 </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
-                <span className="text-slate-600">
-                  Identidade real (CPF, nome) armazenada apenas no sistema do varejista
-                </span>
+                <span className="text-slate-600">{t("about.privacyBullet2")}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
-                <span className="text-slate-600">
-                  LGPD Art. 18 — minimização de dados: DPP armazena apenas o necessário
-                </span>
+                <span className="text-slate-600">{t("about.privacyBullet3")}</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
-                <span className="text-slate-600">
-                  Rastreabilidade mantida sem exposição de dados pessoais
-                </span>
+                <span className="text-slate-600">{t("about.privacyBullet4")}</span>
               </div>
             </div>
           </CardContent>
@@ -307,50 +283,49 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              👥 Modelo de Controle de Acesso (RBAC)
+              👥 {t("about.rbacTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-slate-600">
-              6 perfis × 8 seções do passaporte → matriz de acesso. Cada seção tem
-              um nível de acesso que determina o que cada perfil pode visualizar ou editar.
+              {t("about.rbacDesc")}
             </p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2 text-slate-400">Seção</th>
-                    <th className="p-2 text-center text-slate-400">Fabricante</th>
-                    <th className="p-2 text-center text-slate-400">Varejista</th>
-                    <th className="p-2 text-center text-slate-400">Consumidor</th>
-                    <th className="p-2 text-center text-slate-400">Técnico</th>
-                    <th className="p-2 text-center text-slate-400">Reciclador</th>
-                    <th className="p-2 text-center text-slate-400">Regulador</th>
+                    <th className="text-left p-2 text-slate-400">{t("about.rbacSection")}</th>
+                    <th className="p-2 text-center text-slate-400">{t("about.rbacManufacturer")}</th>
+                    <th className="p-2 text-center text-slate-400">{t("about.rbacRetailer")}</th>
+                    <th className="p-2 text-center text-slate-400">{t("about.rbacConsumer")}</th>
+                    <th className="p-2 text-center text-slate-400">{t("about.rbacTechnician")}</th>
+                    <th className="p-2 text-center text-slate-400">{t("about.rbacRecycler")}</th>
+                    <th className="p-2 text-center text-slate-400">{t("about.rbacRegulator")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <RBACRow section="Identificação" levels={["full", "read", "read", "read", "read", "full"]} />
-                  <RBACRow section="Cadeia Suprimentos" levels={["full", "summary", "hidden", "summary", "summary", "full"]} />
-                  <RBACRow section="Ambiental" levels={["full", "read", "simplified", "read", "read", "full"]} />
-                  <RBACRow section="Manual" levels={["full", "read", "read", "read", "hidden", "full"]} />
-                  <RBACRow section="Reparo" levels={["read", "partial", "own", "write", "read", "full"]} />
-                  <RBACRow section="Propriedade" levels={["read", "read", "own", "hidden", "read", "full"]} />
-                  <RBACRow section="Fim de Vida" levels={["read", "hidden", "hidden", "hidden", "write", "full"]} />
-                  <RBACRow section="Regulatório" levels={["read", "hidden", "hidden", "hidden", "hidden", "full"]} />
+                  <RBACRow section={t("about.rbacIdentification")} levels={["full", "read", "read", "read", "read", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacSupplyChain")} levels={["full", "summary", "hidden", "summary", "summary", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacEnvironmental")} levels={["full", "read", "simplified", "read", "read", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacManual")} levels={["full", "read", "read", "read", "hidden", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacRepair")} levels={["read", "partial", "own", "write", "read", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacOwnership")} levels={["read", "read", "own", "hidden", "read", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacEol")} levels={["read", "hidden", "hidden", "hidden", "write", "full"]} t={t} />
+                  <RBACRow section={t("about.rbacRegulatory")} levels={["read", "hidden", "hidden", "hidden", "hidden", "full"]} t={t} />
                 </tbody>
               </table>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <AccessBadge level="full" label="Total" />
-              <AccessBadge level="read" label="Leitura" />
-              <AccessBadge level="write" label="Escrita" />
-              <AccessBadge level="summary" label="Resumo" />
-              <AccessBadge level="simplified" label="Simplificado" />
-              <AccessBadge level="partial" label="Parcial" />
-              <AccessBadge level="own" label="Próprio" />
-              <AccessBadge level="hidden" label="Oculto" />
+              <AccessBadge level="full" label={t("about.rbacFull")} />
+              <AccessBadge level="read" label={t("about.rbacRead")} />
+              <AccessBadge level="write" label={t("about.rbacWrite")} />
+              <AccessBadge level="summary" label={t("about.rbacSummary")} />
+              <AccessBadge level="simplified" label={t("about.rbacSimplified")} />
+              <AccessBadge level="partial" label={t("about.rbacPartial")} />
+              <AccessBadge level="own" label={t("about.rbacOwn")} />
+              <AccessBadge level="hidden" label={t("about.rbacHidden")} />
             </div>
           </CardContent>
         </Card>
@@ -359,38 +334,37 @@ export default function AboutPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              🚀 Roadmap para Produção
+              🚀 {t("about.roadmapTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-slate-500 mb-4">
-              Funcionalidades que o POC não cobre, mas que seriam necessárias em uma
-              implementação real:
+              {t("about.roadmapDesc")}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <RoadmapItem
                 title="Blockchain / DLT"
-                description="Ancoragem de eventos em ledger distribuído para log à prova de adulteração"
+                description={t("about.roadmapBlockchain")}
               />
               <RoadmapItem
                 title="GS1 Digital Link"
-                description="Resolução de URIs de produto via padrão GS1 Digital Link"
+                description={t("about.roadmapGs1")}
               />
               <RoadmapItem
-                title="Validação GTIN"
-                description="Verificação em tempo real via APIs da GS1 Brasil"
+                title="GTIN Validation"
+                description={t("about.roadmapGtinValidation")}
               />
               <RoadmapItem
                 title="Multi-tenancy"
-                description="Onboarding de múltiplos fabricantes com isolamento de dados"
+                description={t("about.roadmapMultiTenancy")}
               />
               <RoadmapItem
-                title="Telemetria IoT"
-                description="Integração com dados de eletrodomésticos conectados (smart appliances)"
+                title="IoT Telemetry"
+                description={t("about.roadmapIot")}
               />
               <RoadmapItem
-                title="Interoperabilidade EU ESPR"
-                description="Troca de dados com sistemas de DPP europeus via protocolo padronizado"
+                title="EU ESPR Interop"
+                description={t("about.roadmapEspr")}
               />
             </div>
           </CardContent>
@@ -400,7 +374,7 @@ export default function AboutPage() {
 
         {/* Tech Stack */}
         <div className="text-center text-sm text-slate-400 space-y-2">
-          <p className="font-medium text-slate-500">Stack Tecnológica do POC</p>
+          <p className="font-medium text-slate-500">{t("about.techStack")}</p>
           <div className="flex flex-wrap justify-center gap-2">
             <Badge variant="outline" className="text-xs">Next.js 16</Badge>
             <Badge variant="outline" className="text-xs">TypeScript</Badge>
@@ -411,7 +385,7 @@ export default function AboutPage() {
             <Badge variant="outline" className="text-xs">shadcn/ui</Badge>
           </div>
           <p className="text-xs">
-            Dados reais: JG-SUSTENTARE • WK Solutions • Greentech
+            {t("about.realDataFooter")}
           </p>
         </div>
       </div>
@@ -419,7 +393,7 @@ export default function AboutPage() {
   );
 }
 
-function RBACRow({ section, levels }: { section: string; levels: string[] }) {
+function RBACRow({ section, levels, t }: { section: string; levels: string[]; t: (key: TKey) => string }) {
   const colorMap: Record<string, string> = {
     full: "bg-emerald-100 text-emerald-700",
     read: "bg-blue-100 text-blue-700",
@@ -431,15 +405,15 @@ function RBACRow({ section, levels }: { section: string; levels: string[] }) {
     hidden: "bg-slate-100 text-slate-400",
   };
 
-  const labelMap: Record<string, string> = {
-    full: "Total",
-    read: "Leitura",
-    write: "Escrita",
-    summary: "Resumo",
-    simplified: "Simpl.",
-    partial: "Parcial",
-    own: "Próprio",
-    hidden: "—",
+  const labelKeyMap: Record<string, TKey> = {
+    full: "about.rbacFull",
+    read: "about.rbacRead",
+    write: "about.rbacWrite",
+    summary: "about.rbacSummary",
+    simplified: "about.rbacSimplified",
+    partial: "about.rbacPartial",
+    own: "about.rbacOwn",
+    hidden: "about.rbacHidden",
   };
 
   return (
@@ -448,7 +422,7 @@ function RBACRow({ section, levels }: { section: string; levels: string[] }) {
       {levels.map((level, i) => (
         <td key={i} className="p-2 text-center">
           <span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${colorMap[level] || ""}`}>
-            {labelMap[level] || level}
+            {level === "hidden" ? "—" : t(labelKeyMap[level])}
           </span>
         </td>
       ))}

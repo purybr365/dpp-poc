@@ -1,20 +1,31 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CONDITION_LABELS } from "@/lib/rbac-matrix";
+import { useLocale } from "@/lib/i18n/locale-context";
+import type { TKey } from "@/lib/i18n/translations";
+
+const POST_REPAIR_STATUS_KEYS: Record<string, TKey> = {
+  passed: "condition.passed",
+  needs_followup: "condition.needsFollowup",
+  failed: "condition.failed",
+};
 
 interface RepairSectionProps {
   events: Array<Record<string, unknown>>;
 }
 
 export function RepairSection({ events }: RepairSectionProps) {
+  const { t, locale } = useLocale();
+
   if (events.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Reparo & Manutenção</CardTitle>
+          <CardTitle className="text-lg">{t("repair.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-400">Nenhum registro de reparo encontrado.</p>
+          <p className="text-sm text-slate-400">{t("repair.noRecords")}</p>
         </CardContent>
       </Card>
     );
@@ -24,9 +35,9 @@ export function RepairSection({ events }: RepairSectionProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Reparo & Manutenção</CardTitle>
+          <CardTitle className="text-lg">{t("repair.title")}</CardTitle>
           <Badge variant="secondary" className="text-xs">
-            {events.length} registro{events.length > 1 ? "s" : ""}
+            {events.length} {events.length > 1 ? t("repair.records") : t("repair.record")}
           </Badge>
         </div>
       </CardHeader>
@@ -35,8 +46,10 @@ export function RepairSection({ events }: RepairSectionProps) {
           {events.map((event, idx) => {
             const parts = event.partsReplaced as Array<{ name: string; cost: number }> | null;
             const date = event.date
-              ? new Date(event.date as string).toLocaleDateString("pt-BR")
+              ? new Date(event.date as string).toLocaleDateString(locale === "en" ? "en-US" : locale === "es" ? "es" : "pt-BR")
               : "N/A";
+
+            const statusKey = POST_REPAIR_STATUS_KEYS[event.postRepairStatus as string];
 
             return (
               <div
@@ -68,15 +81,13 @@ export function RepairSection({ events }: RepairSectionProps) {
                         : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
-                    {CONDITION_LABELS.postRepairStatus[
-                      event.postRepairStatus as keyof typeof CONDITION_LABELS.postRepairStatus
-                    ] || String(event.postRepairStatus)}
+                    {statusKey ? t(statusKey) : String(event.postRepairStatus)}
                   </Badge>
                 )}
 
                 {parts && parts.length > 0 && (
                   <div className="mt-2">
-                    <span className="text-xs text-slate-400">Peças substituídas:</span>
+                    <span className="text-xs text-slate-400">{t("repair.partsReplaced")}</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {parts.map((part, i) => (
                         <Badge key={i} variant="outline" className="text-xs">

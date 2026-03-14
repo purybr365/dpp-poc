@@ -1,17 +1,21 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 interface RegulatorySectionProps {
   data: Record<string, unknown>;
 }
 
 export function RegulatorySection({ data }: RegulatorySectionProps) {
+  const { t } = useLocale();
   const euAlignment = data.euAlignment as Record<string, unknown> | undefined;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Regulatório & Certificações</CardTitle>
+        <CardTitle className="text-lg">{t("regulatory.title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {!!data.inmetroStatus && (
@@ -33,13 +37,13 @@ export function RegulatorySection({ data }: RegulatorySectionProps) {
         {euAlignment && (
           <div>
             <span className="text-xs text-slate-400 block mb-2">
-              Alinhamento EU ESPR
+              {t("regulatory.euAlignment")}
             </span>
             <div className="border rounded-lg p-4 space-y-3">
               {euAlignment.esprReadinessScore != null && (
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-600">Prontidão ESPR</span>
+                    <span className="text-slate-600">{t("regulatory.esprReadiness")}</span>
                     <span className="font-semibold">{String(euAlignment.esprReadinessScore)}%</span>
                   </div>
                   <div className="bg-slate-100 rounded-full h-2 overflow-hidden">
@@ -65,7 +69,7 @@ export function RegulatorySection({ data }: RegulatorySectionProps) {
                         : "bg-red-100 text-red-700"
                     }
                   >
-                    RoHS {euAlignment.rohsCompliance ? "Conforme" : "Não Conforme"}
+                    RoHS {euAlignment.rohsCompliance ? t("regulatory.rohsCompliant") : t("regulatory.rohsNonCompliant")}
                   </Badge>
                 </div>
               )}

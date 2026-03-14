@@ -1,7 +1,10 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { LIFECYCLE_STAGES } from "@/lib/constants";
-import { buildGS1Path } from "@/lib/gs1";
+import { useLocale } from "@/lib/i18n/locale-context";
+import type { TKey } from "@/lib/i18n/translations";
 
 interface ProductHeroProps {
   product: Record<string, unknown>;
@@ -12,12 +15,21 @@ interface ProductHeroProps {
 }
 
 export function ProductHero({ product, category, productId, gtin, serialNumber }: ProductHeroProps) {
+  const { t, locale } = useLocale();
   const stage = LIFECYCLE_STAGES[product.lifecycleStage as keyof typeof LIFECYCLE_STAGES];
   const mfgDate = product.manufacturingDate
-    ? new Date(product.manufacturingDate as string).toLocaleDateString("pt-BR")
+    ? new Date(product.manufacturingDate as string).toLocaleDateString(locale === "en" ? "en-US" : locale === "es" ? "es" : "pt-BR")
     : "N/A";
 
   const manufacturer = product.manufacturer as { name: string; organization: string } | null;
+
+  const categoryLabel = category
+    ? (locale === "en" ? category.en : category.pt)
+    : (product.category as string);
+
+  const stageLabel = stage
+    ? (locale === "en" ? stage.en : stage.pt)
+    : (product.lifecycleStage as string);
 
   // Build QR code URL - use GS1 path if gtin+serial available
   const qrUrl = gtin && serialNumber
@@ -42,7 +54,7 @@ export function ProductHero({ product, category, productId, gtin, serialNumber }
                 <h1 className="text-2xl font-bold text-slate-900">
                   {product.brand as string} {product.model as string}
                 </h1>
-                <p className="text-slate-500">{category?.pt || (product.category as string)}</p>
+                <p className="text-slate-500">{categoryLabel}</p>
               </div>
               <Badge
                 className={`text-sm ${
@@ -53,34 +65,34 @@ export function ProductHero({ product, category, productId, gtin, serialNumber }
                     : "bg-slate-100 text-slate-700"
                 }`}
               >
-                {stage?.pt || (product.lifecycleStage as string)}
+                {stageLabel}
               </Badge>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div>
-                <span className="text-slate-400 block text-xs">Serial</span>
+                <span className="text-slate-400 block text-xs">{t("passport.serial")}</span>
                 <span className="font-mono text-slate-700">{product.serialNumber as string}</span>
               </div>
               {!!product.gtin && (
                 <div>
-                  <span className="text-slate-400 block text-xs">GTIN</span>
+                  <span className="text-slate-400 block text-xs">{t("passport.gtin")}</span>
                   <span className="font-mono text-slate-700">{product.gtin as string}</span>
                 </div>
               )}
               <div>
-                <span className="text-slate-400 block text-xs">Fabricação</span>
+                <span className="text-slate-400 block text-xs">{t("passport.manufacturing")}</span>
                 <span className="text-slate-700">{mfgDate}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-xs">Fábrica</span>
+                <span className="text-slate-400 block text-xs">{t("passport.factory")}</span>
                 <span className="text-slate-700">{product.manufacturingFacility as string}</span>
               </div>
             </div>
 
             {manufacturer && (
               <div className="text-xs text-slate-400">
-                Fabricante: {manufacturer.organization || manufacturer.name}
+                {t("passport.manufacturer")}: {manufacturer.organization || manufacturer.name}
               </div>
             )}
 
@@ -95,12 +107,12 @@ export function ProductHero({ product, category, productId, gtin, serialNumber }
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={qrUrl}
-                alt="QR Code do Passaporte Digital"
+                alt={t("passport.qrAlt")}
                 width={120}
                 height={120}
                 className="rounded"
               />
-              <span className="text-[10px] text-slate-400">Escaneie para acessar</span>
+              <span className="text-[10px] text-slate-400">{t("passport.scanToAccess")}</span>
             </div>
           )}
         </div>

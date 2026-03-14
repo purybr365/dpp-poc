@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 export default function EndOfLifePage() {
   return (
@@ -20,14 +21,15 @@ function EndOfLifeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!productId) {
-      setError("ID do produto não fornecido. Volte e selecione um produto.");
+      setError(t("form.eol.missingProduct"));
     }
-  }, [productId]);
+  }, [productId, t]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -80,7 +82,7 @@ function EndOfLifeForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Erro ao registrar dados de fim de vida");
+        throw new Error(data.error || t("form.eol.error"));
       }
 
       router.push(`/passport/${productId}`);
@@ -95,29 +97,29 @@ function EndOfLifeForm() {
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80">
           <span className="text-2xl">📋</span>
-          <span className="font-bold text-lg text-slate-900">DPP Brasil</span>
+          <span className="font-bold text-lg text-slate-900">{t("nav.title")}</span>
         </Link>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-slate-900 mb-6">
-          Registro de Fim de Vida / Reciclagem
+          {t("form.eol.title")}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Recycler Info */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Dados do Reciclador</CardTitle>
+              <CardTitle className="text-base">{t("form.eol.recyclerData")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="recyclerName">Nome do Reciclador *</Label>
+                  <Label htmlFor="recyclerName">{t("form.eol.recyclerName")} *</Label>
                   <Input id="recyclerName" name="recyclerName" required placeholder="JG-SUSTENTARE" />
                 </div>
                 <div>
-                  <Label htmlFor="recyclerCity">Cidade *</Label>
+                  <Label htmlFor="recyclerCity">{t("form.eol.city")} *</Label>
                   <Input id="recyclerCity" name="recyclerCity" required placeholder="Alvorada, RS" />
                 </div>
               </div>
@@ -127,22 +129,22 @@ function EndOfLifeForm() {
           {/* Collection & Processing */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Coleta e Processamento</CardTitle>
+              <CardTitle className="text-base">{t("form.eol.collectionProcessing")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="collectionDate">Data da Coleta *</Label>
+                  <Label htmlFor="collectionDate">{t("form.eol.collectionDate")} *</Label>
                   <Input id="collectionDate" name="collectionDate" type="date" required />
                 </div>
                 <div>
-                  <Label htmlFor="collectionLocation">Local de Coleta *</Label>
+                  <Label htmlFor="collectionLocation">{t("form.eol.collectionLocation")} *</Label>
                   <Input id="collectionLocation" name="collectionLocation" required placeholder="Porto Alegre, RS" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="processingDate">Data de Processamento *</Label>
+                  <Label htmlFor="processingDate">{t("form.eol.processingDate")} *</Label>
                   <Input
                     id="processingDate"
                     name="processingDate"
@@ -152,7 +154,7 @@ function EndOfLifeForm() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="processingLocation">Local de Processamento *</Label>
+                  <Label htmlFor="processingLocation">{t("form.eol.processingLocation")} *</Label>
                   <Input id="processingLocation" name="processingLocation" required placeholder="Alvorada, RS" />
                 </div>
               </div>
@@ -162,65 +164,65 @@ function EndOfLifeForm() {
           {/* Condition */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Condição do Produto</CardTitle>
+              <CardTitle className="text-base">{t("form.eol.condition")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="functionalStatus">Status Funcional *</Label>
+                  <Label htmlFor="functionalStatus">{t("form.eol.functionalStatus")} *</Label>
                   <select
                     id="functionalStatus"
                     name="functionalStatus"
                     required
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    <option value="functional">Funcional</option>
-                    <option value="partially_functional">Parcialmente Funcional</option>
-                    <option value="non_functional">Não Funcional</option>
-                    <option value="unknown">Desconhecido</option>
+                    <option value="functional">{t("condition.functional")}</option>
+                    <option value="partially_functional">{t("condition.partiallyFunctional")}</option>
+                    <option value="non_functional">{t("condition.nonFunctional")}</option>
+                    <option value="unknown">{t("condition.unknown")}</option>
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="cosmeticCondition">Condição Estética *</Label>
+                  <Label htmlFor="cosmeticCondition">{t("form.eol.cosmeticCondition")} *</Label>
                   <select
                     id="cosmeticCondition"
                     name="cosmeticCondition"
                     required
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    <option value="good">Boa</option>
-                    <option value="fair">Regular</option>
-                    <option value="poor">Ruim</option>
-                    <option value="very_poor">Muito Ruim</option>
+                    <option value="good">{t("condition.good")}</option>
+                    <option value="fair">{t("condition.fair")}</option>
+                    <option value="poor">{t("condition.poor")}</option>
+                    <option value="very_poor">{t("condition.veryPoor")}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <Label className="text-sm text-slate-500 mb-2 block">Marcações de Condição</Label>
+                <Label className="text-sm text-slate-500 mb-2 block">{t("condition.conditionFlags")}</Label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { name: "isRusted", label: "Enferrujado" },
-                    { name: "isDented", label: "Amassado" },
-                    { name: "isYellowed", label: "Amarelado" },
-                    { name: "isBroken", label: "Quebrado" },
-                    { name: "isDisassembled", label: "Desmontado" },
-                    { name: "isCannibalized", label: "Canibalizado" },
+                    { name: "isRusted", key: "eol.conditionRusted" as const },
+                    { name: "isDented", key: "eol.conditionDented" as const },
+                    { name: "isYellowed", key: "eol.conditionYellowed" as const },
+                    { name: "isBroken", key: "eol.conditionBroken" as const },
+                    { name: "isDisassembled", key: "eol.conditionDisassembled" as const },
+                    { name: "isCannibalized", key: "eol.conditionCannibalized" as const },
                   ].map((flag) => (
                     <label key={flag.name} className="flex items-center gap-2 text-sm">
                       <input type="checkbox" name={flag.name} className="rounded" />
-                      {flag.label}
+                      {t(flag.key)}
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="otherConditionNotes">Outras Observações</Label>
+                <Label htmlFor="otherConditionNotes">{t("form.eol.otherNotes")}</Label>
                 <textarea
                   id="otherConditionNotes"
                   name="otherConditionNotes"
-                  placeholder="Notas sobre a condição..."
+                  placeholder={t("form.eol.otherNotesPlaceholder")}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[60px]"
                 />
               </div>
@@ -230,11 +232,11 @@ function EndOfLifeForm() {
           {/* Disassembly Report */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Relatório de Desmontagem</CardTitle>
+              <CardTitle className="text-base">{t("form.eol.disassembly")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="components">Componentes (separados por vírgula)</Label>
+                <Label htmlFor="components">{t("form.eol.components")}</Label>
                 <Input
                   id="components"
                   name="components"
@@ -244,31 +246,31 @@ function EndOfLifeForm() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="metals">Metais Extraídos</Label>
+                  <Label htmlFor="metals">{t("form.eol.metalsExtracted")}</Label>
                   <Input id="metals" name="metals" placeholder="15.3 kg" />
                 </div>
                 <div>
-                  <Label htmlFor="plastics">Plásticos</Label>
+                  <Label htmlFor="plastics">{t("form.eol.plastics")}</Label>
                   <Input id="plastics" name="plastics" placeholder="8.2 kg" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="copper">Cobre</Label>
+                  <Label htmlFor="copper">{t("form.eol.copper")}</Label>
                   <Input id="copper" name="copper" placeholder="1.5 kg" />
                 </div>
                 <div>
-                  <Label htmlFor="glass">Vidro</Label>
+                  <Label htmlFor="glass">{t("form.eol.glass")}</Label>
                   <Input id="glass" name="glass" placeholder="2.1 kg" />
                 </div>
               </div>
 
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" name="hazardousHandled" className="rounded" />
-                Materiais perigosos tratados adequadamente
+                {t("form.eol.hazardousHandled")}
               </label>
               <div>
-                <Label htmlFor="hazardousDetails">Detalhes de Resíduos Perigosos</Label>
+                <Label htmlFor="hazardousDetails">{t("form.eol.hazardousDetails")}</Label>
                 <Input id="hazardousDetails" name="hazardousDetails" placeholder="Gás R-600a recuperado" />
               </div>
             </CardContent>
@@ -277,27 +279,27 @@ function EndOfLifeForm() {
           {/* Result */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Resultado</CardTitle>
+              <CardTitle className="text-base">{t("form.eol.result")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="recyclingRate">Taxa de Reciclagem (%)</Label>
+                  <Label htmlFor="recyclingRate">{t("form.eol.recyclingRate")}</Label>
                   <Input id="recyclingRate" name="recyclingRate" type="number" step="0.1" placeholder="85.0" />
                 </div>
                 <div>
-                  <Label htmlFor="finalDisposition">Disposição Final *</Label>
+                  <Label htmlFor="finalDisposition">{t("form.eol.finalDisposition")} *</Label>
                   <select
                     id="finalDisposition"
                     name="finalDisposition"
                     required
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    <option value="recycled">Reciclado</option>
-                    <option value="refurbished">Recondicionado</option>
-                    <option value="landfill">Aterro</option>
-                    <option value="incinerated">Incinerado</option>
-                    <option value="partially_recycled">Parcialmente Reciclado</option>
+                    <option value="recycled">{t("form.eol.dispositionRecycled")}</option>
+                    <option value="refurbished">{t("form.eol.dispositionRefurbished")}</option>
+                    <option value="landfill">{t("form.eol.dispositionLandfill")}</option>
+                    <option value="incinerated">{t("form.eol.dispositionIncinerated")}</option>
+                    <option value="partially_recycled">{t("form.eol.dispositionPartiallyRecycled")}</option>
                   </select>
                 </div>
               </div>
@@ -312,11 +314,11 @@ function EndOfLifeForm() {
 
           <div className="flex gap-3">
             <Button type="submit" disabled={loading || !productId} className="flex-1">
-              {loading ? "Registrando..." : "Registrar Fim de Vida"}
+              {loading ? t("form.eol.submitting") : t("form.eol.submit")}
             </Button>
             <Link href="/">
               <Button variant="outline" type="button">
-                Cancelar
+                {t("form.cancel")}
               </Button>
             </Link>
           </div>
