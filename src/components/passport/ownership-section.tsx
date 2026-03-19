@@ -16,8 +16,10 @@ const EVENT_ICONS: Record<string, string> = {
   MANUFACTURED: "🏭",
   SOLD_TO_RETAILER: "🏬",
   SOLD_TO_CONSUMER: "🛒",
+  REGISTERED: "📝",
   RESOLD: "🔄",
-  DONATED: "🤝",
+  SECOND_HAND_RESALE: "🤝",
+  DONATED: "🎁",
   COLLECTED_FOR_RECYCLING: "♻️",
 };
 
@@ -37,6 +39,12 @@ export function OwnershipSection({ events, manufacturingFacility }: OwnershipSec
       }
       if ((eventType === "SOLD_TO_RETAILER" || eventType === "SOLD_TO_CONSUMER") && saleLocation) {
         return { label: t(`ownershipEvent.${eventType}` as TKey), location: saleLocation, type: "sale" as const };
+      }
+      if (eventType === "REGISTERED" && saleLocation) {
+        return { label: t(`ownershipEvent.REGISTERED` as TKey), location: saleLocation, type: "sale" as const };
+      }
+      if (eventType === "SECOND_HAND_RESALE" && saleLocation) {
+        return { label: t(`ownershipEvent.SECOND_HAND_RESALE` as TKey), location: saleLocation, type: "sale" as const };
       }
       if (eventType === "COLLECTED_FOR_RECYCLING") {
         const toEntity = event.toEntity as string | undefined;
@@ -124,6 +132,11 @@ export function OwnershipSection({ events, manufacturingFacility }: OwnershipSec
                         {!!event.saleLocation && (
                           <p>
                             📍 {t("ownership.saleLocation")}: {String(event.saleLocation)}
+                          </p>
+                        )}
+                        {!!event.price && (
+                          <p>
+                            💰 {t("ownership.price")}: {String(event.currency || "BRL")} {Number(event.price).toLocaleString(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", { minimumFractionDigits: 2 })}
                           </p>
                         )}
                       </div>

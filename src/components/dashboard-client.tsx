@@ -21,8 +21,40 @@ interface DashboardProduct {
   model: string;
   category: string;
   lifecycleStage: string;
-  manufacturingDate: string; // ISO string
+  manufacturingDate: string;
   manufacturingFacility: string | null;
+}
+
+interface KpiRow {
+  category: string;
+  brand: string;
+}
+
+interface RepairKpiRow extends KpiRow {
+  repairCount: number;
+  topIssue: string;
+  topIssueCount: number;
+}
+
+interface PercentageKpiRow extends KpiRow {
+  total: number;
+  percentage: number;
+  repaired?: number;
+  registered?: number;
+  resold?: number;
+}
+
+interface LifecycleKpiRow extends KpiRow {
+  avgMonths: number;
+  count: number;
+}
+
+interface KpiData {
+  repairKpi: RepairKpiRow[];
+  repairPercentage: PercentageKpiRow[];
+  registeredPercentage: PercentageKpiRow[];
+  resalePercentage: PercentageKpiRow[];
+  lifecycleKpi: LifecycleKpiRow[];
 }
 
 interface DashboardProps {
@@ -41,32 +73,19 @@ interface DashboardProps {
     totalEOL: number;
     totalOwnership: number;
     realDataCount: number;
+    registeredCount: number;
+    secondHandResaleCount: number;
   };
+  kpiData?: KpiData;
 }
 
-export function DashboardClient({ products, role, userName, userOrganization, stats }: DashboardProps) {
+export function DashboardClient({ products, role, userName, userOrganization, stats, kpiData }: DashboardProps) {
   const { t, locale } = useLocale();
   const [filteredIds, setFilteredIds] = useState<string[] | null>(null);
 
   const displayProducts = filteredIds
     ? products.filter((p) => filteredIds.includes(p.id))
     : products;
-
-  const categoryBreakdown = products.reduce(
-    (acc, p) => {
-      acc[p.category] = (acc[p.category] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  const brandBreakdown = products.reduce(
-    (acc, p) => {
-      acc[p.brand] = (acc[p.brand] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
 
   function getPassportUrl(product: DashboardProduct) {
     if (product.gtin) {
@@ -122,96 +141,246 @@ export function DashboardClient({ products, role, userName, userOrganization, st
         {/* Role-specific stats */}
         {role === "MANUFACTURER" && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <StatCard title={t("dashboard.totalProducts")} value={stats.totalProducts} />
-            <StatCard title={t("dashboard.manufactured")} value={stats.manufactured} color="text-blue-600" />
-            <StatCard title={t("dashboard.inUse")} value={stats.inUse} color="text-green-600" />
-            <StatCard title={t("dashboard.recycled")} value={stats.recycled} color="text-emerald-600" />
+            <StatCard title={t("dashboard.totalProducts")} value={stats.totalProducts} icon="📦" />
+            <StatCard title={t("dashboard.registered")} value={stats.registeredCount} color="text-blue-600" icon="📝" />
+            <StatCard title={t("dashboard.recycled")} value={stats.recycled} color="text-emerald-600" icon="♻️" />
+            <StatCard title={t("dashboard.repairsPerformed")} value={stats.totalRepairs} color="text-orange-600" icon="🔧" />
           </div>
         )}
 
         {role === "CONSUMER" && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-            <StatCard title={t("dashboard.registered")} value={stats.totalProducts} />
-            <StatCard title={t("dashboard.inUse")} value={stats.inUse} color="text-green-600" />
-            <StatCard title={t("dashboard.withRepair")} value={stats.totalRepairs} color="text-orange-600" />
+            <StatCard title={t("dashboard.registered")} value={stats.registeredCount} icon="📝" />
+            <StatCard title={t("dashboard.inUse")} value={stats.inUse} color="text-green-600" icon="🏠" />
+            <StatCard title={t("dashboard.withRepair")} value={stats.totalRepairs} color="text-orange-600" icon="🔧" />
           </div>
         )}
 
         {role === "REPAIR_TECH" && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <StatCard title={t("dashboard.totalProducts")} value={stats.totalProducts} />
-            <StatCard title={t("dashboard.underRepair")} value={stats.underRepair} color="text-orange-600" />
-            <StatCard title={t("dashboard.repairsPerformed")} value={stats.totalRepairs} color="text-blue-600" />
-            <StatCard title={t("dashboard.inUse")} value={stats.inUse} color="text-green-600" />
+            <StatCard title={t("dashboard.totalProducts")} value={stats.totalProducts} icon="📦" />
+            <StatCard title={t("dashboard.underRepair")} value={stats.underRepair} color="text-orange-600" icon="🔧" />
+            <StatCard title={t("dashboard.repairsPerformed")} value={stats.totalRepairs} color="text-blue-600" icon="✅" />
+            <StatCard title={t("dashboard.inUse")} value={stats.inUse} color="text-green-600" icon="🏠" />
           </div>
         )}
 
         {role === "RECYCLER" && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <StatCard title={t("dashboard.totalProducts")} value={stats.totalProducts} />
-            <StatCard title={t("dashboard.recycled")} value={stats.recycled} color="text-emerald-600" />
-            <StatCard title={t("dashboard.eolRecords")} value={stats.totalEOL} color="text-green-600" />
-            <StatCard title={t("dashboard.realData")} value={stats.realDataCount} color="text-blue-600" />
+            <StatCard title={t("dashboard.totalProducts")} value={stats.totalProducts} icon="📦" />
+            <StatCard title={t("dashboard.recycled")} value={stats.recycled} color="text-emerald-600" icon="♻️" />
+            <StatCard title={t("dashboard.eolRecords")} value={stats.totalEOL} color="text-green-600" icon="📋" />
+            <StatCard title={t("dashboard.realData")} value={stats.realDataCount} color="text-blue-600" icon="🔬" />
           </div>
         )}
 
-        {/* Category + Brand breakdowns (for Manufacturer) */}
-        {role === "MANUFACTURER" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-slate-500">{t("dashboard.byCategory")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {Object.entries(categoryBreakdown).map(([cat, count]) => {
-                    const catInfo = PRODUCT_CATEGORIES[cat as keyof typeof PRODUCT_CATEGORIES];
-                    return (
-                      <div key={cat} className="flex items-center justify-between">
-                        <span className="text-sm">
-                          {catInfo?.icon || "📦"} {t(`category.${cat}` as TKey)}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <div
-                              className="bg-blue-500 h-full rounded-full"
-                              style={{ width: `${(count / stats.totalProducts) * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium w-8 text-right">{count}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+        {/* KPI Section — Manufacturer only */}
+        {role === "MANUFACTURER" && kpiData && (
+          <div className="space-y-6 mb-8">
+            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              📊 {t("dashboard.kpiTitle")}
+            </h2>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-slate-500">{t("dashboard.byBrand")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {Object.entries(brandBreakdown)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([brand, count]) => (
-                      <div key={brand} className="flex items-center justify-between">
-                        <span className="text-sm">{brand}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <div
-                              className="bg-emerald-500 h-full rounded-full"
-                              style={{ width: `${(count / stats.totalProducts) * 100}%` }}
-                            />
+            {/* Row 1: Repair KPI (table) + Repair Percentage (bar chart) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Products Repaired with Most Common Problem */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-500 flex items-center gap-2">
+                    🔧 {t("dashboard.kpi.repairsByProblem")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {kpiData.repairKpi.length === 0 ? (
+                    <p className="text-xs text-slate-400">{t("dashboard.kpi.noData")}</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {kpiData.repairKpi
+                        .sort((a, b) => b.repairCount - a.repairCount)
+                        .map((row, idx) => {
+                          const catInfo = PRODUCT_CATEGORIES[row.category as keyof typeof PRODUCT_CATEGORIES];
+                          return (
+                            <div key={idx} className="bg-slate-50 rounded-lg p-3">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium">
+                                  {catInfo?.icon || "📦"} {t(`category.${row.category}` as TKey)} — {row.brand}
+                                </span>
+                                <Badge variant="secondary" className="text-xs">{row.repairCount} {t("dashboard.kpi.repairs")}</Badge>
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-slate-400">{t("dashboard.kpi.topIssue")}:</span>
+                                <span className="text-xs text-orange-600 font-medium">{row.topIssue}</span>
+                                <span className="text-xs text-slate-300">({row.topIssueCount}x)</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Percentage of Products Repaired */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-500 flex items-center gap-2">
+                    📈 {t("dashboard.kpi.repairPercentage")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {kpiData.repairPercentage
+                      .filter((r) => r.percentage > 0)
+                      .sort((a, b) => b.percentage - a.percentage)
+                      .map((row, idx) => {
+                        const catInfo = PRODUCT_CATEGORIES[row.category as keyof typeof PRODUCT_CATEGORIES];
+                        return (
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-slate-600">
+                                {catInfo?.icon || "📦"} {t(`category.${row.category}` as TKey)} — {row.brand}
+                              </span>
+                              <span className="text-xs font-semibold text-orange-600">{row.percentage}%</span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-orange-400 h-full rounded-full transition-all duration-500"
+                                style={{ width: `${row.percentage}%` }}
+                              />
+                            </div>
                           </div>
-                          <span className="text-sm font-medium w-8 text-right">{count}</span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
+                        );
+                      })}
+                    {kpiData.repairPercentage.filter((r) => r.percentage > 0).length === 0 && (
+                      <p className="text-xs text-slate-400">{t("dashboard.kpi.noData")}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Row 2: Avg Lifecycle + Registration Percentage */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Average Lifecycle of Recycled Products */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-500 flex items-center gap-2">
+                    ⏱️ {t("dashboard.kpi.avgLifecycle")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {kpiData.lifecycleKpi.length === 0 ? (
+                    <p className="text-xs text-slate-400">{t("dashboard.kpi.noData")}</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {kpiData.lifecycleKpi
+                        .sort((a, b) => b.avgMonths - a.avgMonths)
+                        .map((row, idx) => {
+                          const catInfo = PRODUCT_CATEGORIES[row.category as keyof typeof PRODUCT_CATEGORIES];
+                          const years = Math.floor(row.avgMonths / 12);
+                          const months = row.avgMonths % 12;
+                          const label = years > 0
+                            ? `${years} ${t("time.years")} ${months > 0 ? `${months} ${t("time.months")}` : ""}`
+                            : `${months} ${t("time.months")}`;
+                          const maxMonths = Math.max(...kpiData.lifecycleKpi.map((r) => r.avgMonths), 1);
+                          return (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-slate-600">
+                                  {catInfo?.icon || "📦"} {t(`category.${row.category}` as TKey)} — {row.brand}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-emerald-600">{label.trim()}</span>
+                                  <span className="text-xs text-slate-300">({row.count} {t("dashboard.kpi.products")})</span>
+                                </div>
+                              </div>
+                              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div
+                                  className="bg-emerald-400 h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${(row.avgMonths / maxMonths) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Percentage of Products Registered */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-500 flex items-center gap-2">
+                    📝 {t("dashboard.kpi.registeredPercentage")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {kpiData.registeredPercentage
+                      .sort((a, b) => b.percentage - a.percentage)
+                      .map((row, idx) => {
+                        const catInfo = PRODUCT_CATEGORIES[row.category as keyof typeof PRODUCT_CATEGORIES];
+                        return (
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-slate-600">
+                                {catInfo?.icon || "📦"} {t(`category.${row.category}` as TKey)} — {row.brand}
+                              </span>
+                              <span className="text-xs font-semibold text-blue-600">{row.percentage}%</span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-blue-400 h-full rounded-full transition-all duration-500"
+                                style={{ width: `${row.percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Row 3: Second-Hand Resale Percentage */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-500 flex items-center gap-2">
+                    🤝 {t("dashboard.kpi.resalePercentage")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {kpiData.resalePercentage
+                      .sort((a, b) => b.percentage - a.percentage)
+                      .map((row, idx) => {
+                        const catInfo = PRODUCT_CATEGORIES[row.category as keyof typeof PRODUCT_CATEGORIES];
+                        return (
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-slate-600">
+                                {catInfo?.icon || "📦"} {t(`category.${row.category}` as TKey)} — {row.brand}
+                              </span>
+                              <span className="text-xs font-semibold text-purple-600">{row.percentage}%</span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-purple-400 h-full rounded-full transition-all duration-500"
+                                style={{ width: `${row.percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    {kpiData.resalePercentage.filter((r) => r.percentage > 0).length === 0 && (
+                      <p className="text-xs text-slate-400">{t("dashboard.kpi.noResaleData")}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
 
@@ -295,15 +464,20 @@ function StatCard({
   title,
   value,
   color = "text-slate-900",
+  icon,
 }: {
   title: string;
   value: number;
   color?: string;
+  icon?: string;
 }) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-slate-500">{title}</CardTitle>
+        <CardTitle className="text-sm text-slate-500 flex items-center gap-1.5">
+          {icon && <span>{icon}</span>}
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p className={`text-3xl font-bold ${color}`}>{value}</p>

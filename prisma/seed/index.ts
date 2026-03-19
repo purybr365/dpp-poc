@@ -215,8 +215,10 @@ async function seedRealProducts() {
       },
     });
 
-    // Add ownership chain
-    const ownershipEvents = generateOwnershipChain(product.id, rp.brand, "RECYCLED");
+    // Add ownership chain — real recycled products: ~50% with registration, ~30% with second-hand resale
+    const addRegistration = Math.random() < 0.5;
+    const addSecondHandResale = Math.random() < 0.3;
+    const ownershipEvents = generateOwnershipChain(product.id, rp.brand, "RECYCLED", { addRegistration, addSecondHandResale });
     for (const event of ownershipEvents) {
       await prisma.ownershipEvent.create({ data: event as never });
     }
@@ -259,8 +261,10 @@ async function seedMockProducts() {
       },
     });
 
-    // Add ownership chain
-    const ownershipEvents = generateOwnershipChain(product.id, mp.brand, mp.lifecycleStage);
+    // Add ownership chain — mock products: ~60% with registration, ~20% with second-hand resale (mainly IN_USE)
+    const addRegistration = ["IN_USE", "UNDER_REPAIR", "RESOLD"].includes(mp.lifecycleStage) && Math.random() < 0.6;
+    const addSecondHandResale = ["IN_USE", "RESOLD"].includes(mp.lifecycleStage) && Math.random() < 0.2;
+    const ownershipEvents = generateOwnershipChain(product.id, mp.brand, mp.lifecycleStage, { addRegistration, addSecondHandResale });
     for (const event of ownershipEvents) {
       await prisma.ownershipEvent.create({ data: event as never });
     }

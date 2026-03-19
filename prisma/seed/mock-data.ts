@@ -439,7 +439,22 @@ export function generateRepairEvents(productId: string, count: number) {
   return events;
 }
 
-export function generateOwnershipChain(productId: string, brand: string, stage: string) {
+const CONSUMER_CITIES = [
+  "São Paulo, SP",
+  "Rio de Janeiro, RJ",
+  "Belo Horizonte, MG",
+  "Curitiba, PR",
+  "Porto Alegre, RS",
+  "Recife, PE",
+  "Salvador, BA",
+  "Fortaleza, CE",
+  "Brasília, DF",
+  "Campinas, SP",
+  "Goiânia, GO",
+  "Florianópolis, SC",
+];
+
+export function generateOwnershipChain(productId: string, brand: string, stage: string, options?: { addRegistration?: boolean; addSecondHandResale?: boolean }) {
   const events = [];
   const mfgDate = randomDate(new Date("2023-01-01"), new Date("2024-06-01"));
 
@@ -486,6 +501,42 @@ export function generateOwnershipChain(productId: string, brand: string, stage: 
           faultCodes: randomPick([[], [], ["E01"], ["E03", "E07"]]),
         },
       });
+
+      // Registered event — consumer registers the product before first use
+      if (options?.addRegistration) {
+        const registrationDate = new Date(saleToConsumer.getTime() + randomInt(0, 7) * 86400000);
+        events.push({
+          productId,
+          eventType: "REGISTERED",
+          date: registrationDate,
+          fromEntity: null,
+          toEntity: null,
+          consumerIdHash: consumerHash,
+          saleLocation: randomPick(CONSUMER_CITIES),
+          notes: "Produto registrado pelo consumidor",
+        });
+      }
+
+      // Second-hand resale — consumer sells to another consumer
+      if (options?.addSecondHandResale) {
+        const resaleDate = new Date(saleToConsumer.getTime() + randomInt(180, 730) * 86400000);
+        const buyerHash = Math.random().toString(36).substr(2, 8);
+        // Ensure the resale date is before any collection/recycling event
+        if (!["COLLECTED", "RECYCLED"].includes(stage) || resaleDate < new Date("2025-11-01")) {
+          events.push({
+            productId,
+            eventType: "SECOND_HAND_RESALE",
+            date: resaleDate,
+            fromEntity: `Consumer ${consumerHash}`,
+            toEntity: `Consumer ${buyerHash}`,
+            consumerIdHash: buyerHash,
+            saleLocation: randomPick(CONSUMER_CITIES),
+            price: randomFloat(200, 3000, 0),
+            currency: "BRL",
+            notes: "Venda entre consumidores em marketplace",
+          });
+        }
+      }
     }
 
     if (["COLLECTED", "RECYCLED"].includes(stage)) {
