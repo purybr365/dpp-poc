@@ -324,7 +324,7 @@ export function generateMockProducts(): MockProduct[] {
       model: r.model,
       serialNumber: r.serial,
       gtin: getStandardGTIN(r.brand, r.model),
-      manufacturingDate: randomDate(new Date("2023-01-01"), new Date("2025-06-01")),
+      manufacturingDate: randomDate(new Date("2018-01-01"), new Date("2023-12-31")),
       manufacturingFacility: randomPick(FACTORIES[r.brand] || ["Manaus, AM"]),
       batchNumber: `LOT-${randomInt(1000, 9999)}`,
       lifecycleStage: randomPick(["SOLD", "IN_USE", "IN_USE", "IN_USE"]),
@@ -354,7 +354,7 @@ export function generateMockProducts(): MockProduct[] {
       model: w.model,
       serialNumber: w.serial,
       gtin: getStandardGTIN(w.brand, w.model),
-      manufacturingDate: randomDate(new Date("2023-06-01"), new Date("2025-03-01")),
+      manufacturingDate: randomDate(new Date("2018-01-01"), new Date("2023-12-31")),
       manufacturingFacility: randomPick(FACTORIES[w.brand] || ["Curitiba, PR"]),
       batchNumber: `LOT-${randomInt(1000, 9999)}`,
       lifecycleStage: randomPick(["MANUFACTURED", "SOLD", "IN_USE"]),
@@ -386,7 +386,7 @@ export function generateMockProducts(): MockProduct[] {
       model: ac.model,
       serialNumber: ac.serial,
       gtin: getStandardGTIN(ac.brand, ac.model),
-      manufacturingDate: randomDate(new Date("2024-01-01"), new Date("2025-09-01")),
+      manufacturingDate: randomDate(new Date("2018-01-01"), new Date("2023-12-31")),
       manufacturingFacility: "Manaus, AM",
       batchNumber: `LOT-${randomInt(1000, 9999)}`,
       lifecycleStage: randomPick(["MANUFACTURED", "SOLD", "IN_USE", "IN_USE"]),
@@ -405,7 +405,7 @@ export function generateMockProducts(): MockProduct[] {
   return products;
 }
 
-export function generateRepairEvents(productId: string, count: number) {
+export function generateRepairEvents(productId: string, count: number, manufacturingDate?: Date) {
   const events = [];
   const issues = [
     { desc: "Compressor não liga", parts: [{ name: "Compressor Embraco VEMY7C", partNumber: "W10393809", cost: 450 }] },
@@ -418,13 +418,18 @@ export function generateRepairEvents(productId: string, count: number) {
     { desc: "Bomba de drenagem entupida", parts: [{ name: "Bomba de drenagem Askoll", partNumber: "W10130914", cost: 110 }] },
   ];
 
+  // Repairs happen between 3 months and 2 years after manufacturing
+  const mfgTime = manufacturingDate?.getTime() || new Date("2020-01-01").getTime();
+  const repairStart = new Date(mfgTime + 90 * 86400000);
+  const repairEnd = new Date(mfgTime + 730 * 86400000);
+
   for (let i = 0; i < count; i++) {
     const issue = randomPick(issues);
     const laborCost = randomFloat(80, 200);
     const partsCost = issue.parts.reduce((sum, p) => sum + p.cost, 0);
     events.push({
       productId,
-      date: randomDate(new Date("2024-01-01"), new Date("2026-01-01")),
+      date: randomDate(repairStart, repairEnd),
       serviceCenterId: `SC-${randomInt(1000, 9999)}`,
       issueDescription: issue.desc,
       partsReplaced: issue.parts,
@@ -454,9 +459,9 @@ const CONSUMER_CITIES = [
   "Florianópolis, SC",
 ];
 
-export function generateOwnershipChain(productId: string, brand: string, stage: string, options?: { addRegistration?: boolean; addSecondHandResale?: boolean }) {
+export function generateOwnershipChain(productId: string, brand: string, stage: string, options?: { addRegistration?: boolean; addSecondHandResale?: boolean; manufacturingDate?: Date }) {
   const events = [];
-  const mfgDate = randomDate(new Date("2023-01-01"), new Date("2024-06-01"));
+  const mfgDate = options?.manufacturingDate || randomDate(new Date("2018-01-01"), new Date("2023-12-31"));
 
   // Manufacturing event
   events.push({
@@ -483,7 +488,10 @@ export function generateOwnershipChain(productId: string, brand: string, stage: 
     });
 
     if (["IN_USE", "UNDER_REPAIR", "RESOLD", "COLLECTED", "RECYCLED"].includes(stage)) {
-      const saleToConsumer = new Date(saleToRetailer.getTime() + randomInt(1, 30) * 86400000);
+      // Ensure sale to consumer happens within a reasonable window (1-60 days after retailer)
+      // but never more than ~10 months after manufacturing
+      const maxConsumerDelay = Math.min(60, Math.floor((365 * 0.8 - 60) / 1)); // leave room for resale within 1yr
+      const saleToConsumer = new Date(saleToRetailer.getTime() + randomInt(1, Math.max(1, maxConsumerDelay)) * 86400000);
       const consumerHash = Math.random().toString(36).substr(2, 8);
       events.push({
         productId,
@@ -519,31 +527,34 @@ export function generateOwnershipChain(productId: string, brand: string, stage: 
 
       // Second-hand resale — consumer sells to another consumer
       if (options?.addSecondHandResale) {
-        const resaleDate = new Date(saleToConsumer.getTime() + randomInt(180, 730) * 86400000);
+        // Resale within 180 to 365 days from manufacturing (stay within 1 year)
+        const daysSinceMfg = Math.floor((saleToConsumer.getTime() - mfgDate.getTime()) / 86400000);
+        const maxResaleDays = Math.max(30, 365 - daysSinceMfg);
+        const resaleDate = new Date(saleToConsumer.getTime() + randomInt(30, Math.min(180, maxResaleDays)) * 86400000);
         const buyerHash = Math.random().toString(36).substr(2, 8);
-        // Ensure the resale date is before any collection/recycling event
-        if (!["COLLECTED", "RECYCLED"].includes(stage) || resaleDate < new Date("2025-11-01")) {
-          events.push({
-            productId,
-            eventType: "SECOND_HAND_RESALE",
-            date: resaleDate,
-            fromEntity: `Consumer ${consumerHash}`,
-            toEntity: `Consumer ${buyerHash}`,
-            consumerIdHash: buyerHash,
-            saleLocation: randomPick(CONSUMER_CITIES),
-            price: randomFloat(200, 3000, 0),
-            currency: "BRL",
-            notes: "Venda entre consumidores em marketplace",
-          });
-        }
+        events.push({
+          productId,
+          eventType: "SECOND_HAND_RESALE",
+          date: resaleDate,
+          fromEntity: `Consumer ${consumerHash}`,
+          toEntity: `Consumer ${buyerHash}`,
+          consumerIdHash: buyerHash,
+          saleLocation: randomPick(CONSUMER_CITIES),
+          price: randomFloat(200, 3000, 0),
+          currency: "BRL",
+          notes: "Venda entre consumidores em marketplace",
+        });
       }
     }
 
     if (["COLLECTED", "RECYCLED"].includes(stage)) {
+      // Collection happens after the ownership chain, within reasonable time
+      const lastEventDate = events[events.length - 1].date;
+      const collectionDate = new Date(lastEventDate.getTime() + randomInt(60, 365) * 86400000);
       events.push({
         productId,
         eventType: "COLLECTED_FOR_RECYCLING",
-        date: randomDate(new Date("2025-12-01"), new Date("2026-02-10")),
+        date: collectionDate,
         fromEntity: "Consumidor",
         toEntity: randomPick(["JG-SUSTENTARE", "WK Solutions", "Greentech"]),
         notes: "Coletado para reciclagem - PNRS",

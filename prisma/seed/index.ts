@@ -218,14 +218,15 @@ async function seedRealProducts() {
     // Add ownership chain — real recycled products: ~50% with registration, ~30% with second-hand resale
     const addRegistration = Math.random() < 0.5;
     const addSecondHandResale = Math.random() < 0.3;
-    const ownershipEvents = generateOwnershipChain(product.id, rp.brand, "RECYCLED", { addRegistration, addSecondHandResale });
+    const mfgDate = new Date(rp.processingDate.getTime() - 365 * 3 * 86400000);
+    const ownershipEvents = generateOwnershipChain(product.id, rp.brand, "RECYCLED", { addRegistration, addSecondHandResale, manufacturingDate: mfgDate });
     for (const event of ownershipEvents) {
       await prisma.ownershipEvent.create({ data: event as never });
     }
 
     // Add 1-2 repair events
     const repairCount = Math.floor(Math.random() * 2) + 1;
-    const repairEvents = generateRepairEvents(product.id, repairCount);
+    const repairEvents = generateRepairEvents(product.id, repairCount, mfgDate);
     for (const event of repairEvents) {
       await prisma.repairEvent.create({ data: event as never });
     }
@@ -264,7 +265,7 @@ async function seedMockProducts() {
     // Add ownership chain — mock products: ~60% with registration, ~20% with second-hand resale (mainly IN_USE)
     const addRegistration = ["IN_USE", "UNDER_REPAIR", "RESOLD"].includes(mp.lifecycleStage) && Math.random() < 0.6;
     const addSecondHandResale = ["IN_USE", "RESOLD"].includes(mp.lifecycleStage) && Math.random() < 0.2;
-    const ownershipEvents = generateOwnershipChain(product.id, mp.brand, mp.lifecycleStage, { addRegistration, addSecondHandResale });
+    const ownershipEvents = generateOwnershipChain(product.id, mp.brand, mp.lifecycleStage, { addRegistration, addSecondHandResale, manufacturingDate: mp.manufacturingDate });
     for (const event of ownershipEvents) {
       await prisma.ownershipEvent.create({ data: event as never });
     }
@@ -273,7 +274,7 @@ async function seedMockProducts() {
     if (["IN_USE", "UNDER_REPAIR"].includes(mp.lifecycleStage)) {
       const repairCount = Math.floor(Math.random() * 3);
       if (repairCount > 0) {
-        const repairEvents = generateRepairEvents(product.id, repairCount);
+        const repairEvents = generateRepairEvents(product.id, repairCount, mp.manufacturingDate);
         for (const event of repairEvents) {
           await prisma.repairEvent.create({ data: event as never });
         }

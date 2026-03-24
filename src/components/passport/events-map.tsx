@@ -79,7 +79,7 @@ function findCityGeo(location: string): { lat: number; lon: number; state: strin
 interface EventLocation {
   label: string;
   location: string;
-  type: "manufacture" | "sale" | "repair" | "collection" | "recycling";
+  type: "manufacture" | "sale" | "registered" | "resale" | "repair" | "collection" | "recycling";
 }
 
 interface EventsMapProps {
@@ -89,6 +89,8 @@ interface EventsMapProps {
 const TYPE_COLORS: Record<string, string> = {
   manufacture: "#3b82f6",
   sale: "#8b5cf6",
+  registered: "#6366f1",
+  resale: "#a855f7",
   repair: "#f97316",
   collection: "#10b981",
   recycling: "#06b6d4",
@@ -97,6 +99,8 @@ const TYPE_COLORS: Record<string, string> = {
 const TYPE_LABELS: Record<string, Record<string, string>> = {
   manufacture: { "pt-BR": "Fabricação", en: "Manufacturing", es: "Fabricación" },
   sale: { "pt-BR": "Venda", en: "Sale", es: "Venta" },
+  registered: { "pt-BR": "Registro", en: "Registration", es: "Registro" },
+  resale: { "pt-BR": "Revenda", en: "Resale", es: "Reventa" },
   repair: { "pt-BR": "Reparo", en: "Repair", es: "Reparación" },
   collection: { "pt-BR": "Coleta", en: "Collection", es: "Recolección" },
   recycling: { "pt-BR": "Reciclagem", en: "Recycling", es: "Reciclaje" },

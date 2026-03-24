@@ -10,6 +10,7 @@ import { EventsMap } from "./events-map";
 interface OwnershipSectionProps {
   events: Array<Record<string, unknown>>;
   manufacturingFacility?: string;
+  repairEvents?: Array<Record<string, unknown>>;
 }
 
 const EVENT_ICONS: Record<string, string> = {
@@ -23,38 +24,44 @@ const EVENT_ICONS: Record<string, string> = {
   COLLECTED_FOR_RECYCLING: "♻️",
 };
 
-export function OwnershipSection({ events, manufacturingFacility }: OwnershipSectionProps) {
+export function OwnershipSection({ events, manufacturingFacility, repairEvents }: OwnershipSectionProps) {
   const { t, locale } = useLocale();
   const [showMap, setShowMap] = useState(false);
 
   // Build map events from ownership data
-  const mapEvents = events
+  const ownershipMapEvents = events
     .map((event) => {
       const eventType = String(event.eventType);
       const saleLocation = event.saleLocation as string | undefined;
-      const retailerName = event.retailerName as string | undefined;
+      const date = event.date as string | undefined;
 
       if (eventType === "MANUFACTURED" && manufacturingFacility) {
-        return { label: t("ownershipEvent.MANUFACTURED"), location: manufacturingFacility, type: "manufacture" as const };
+        return { label: t("ownershipEvent.MANUFACTURED"), location: manufacturingFacility, type: "manufacture" as const, date };
       }
       if ((eventType === "SOLD_TO_RETAILER" || eventType === "SOLD_TO_CONSUMER") && saleLocation) {
-        return { label: t(`ownershipEvent.${eventType}` as TKey), location: saleLocation, type: "sale" as const };
+        return { label: t(`ownershipEvent.${eventType}` as TKey), location: saleLocation, type: "sale" as const, date };
       }
       if (eventType === "REGISTERED" && saleLocation) {
-        return { label: t(`ownershipEvent.REGISTERED` as TKey), location: saleLocation, type: "sale" as const };
+        return { label: t(`ownershipEvent.REGISTERED` as TKey), location: saleLocation, type: "registered" as const, date };
       }
       if (eventType === "SECOND_HAND_RESALE" && saleLocation) {
-        return { label: t(`ownershipEvent.SECOND_HAND_RESALE` as TKey), location: saleLocation, type: "sale" as const };
+        return { label: t(`ownershipEvent.SECOND_HAND_RESALE` as TKey), location: saleLocation, type: "resale" as const, date };
       }
       if (eventType === "COLLECTED_FOR_RECYCLING") {
         const toEntity = event.toEntity as string | undefined;
         if (toEntity) {
-          return { label: t("ownershipEvent.COLLECTED_FOR_RECYCLING"), location: toEntity, type: "collection" as const };
+          return { label: t("ownershipEvent.COLLECTED_FOR_RECYCLING"), location: toEntity, type: "collection" as const, date };
         }
       }
       return null;
     })
-    .filter(Boolean) as { label: string; location: string; type: "manufacture" | "sale" | "repair" | "collection" | "recycling" }[];
+    .filter(Boolean) as { label: string; location: string; type: "manufacture" | "sale" | "registered" | "resale" | "repair" | "collection" | "recycling"; date?: string }[];
+
+  // Combine all events sorted by date
+  const mapEvents = [...ownershipMapEvents].sort((a, b) => {
+    if (!a.date || !b.date) return 0;
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  }) as { label: string; location: string; type: "manufacture" | "sale" | "registered" | "resale" | "repair" | "collection" | "recycling" }[];
 
   if (events.length === 0) {
     return (

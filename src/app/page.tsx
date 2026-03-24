@@ -44,8 +44,10 @@ export default async function HomePage() {
   const repairEvents = await prisma.repairEvent.findMany({
     select: {
       issueDescription: true,
+      date: true,
+      productId: true,
       product: {
-        select: { category: true, brand: true },
+        select: { category: true, brand: true, manufacturingDate: true },
       },
     },
   });
@@ -56,7 +58,7 @@ export default async function HomePage() {
     select: {
       eventType: true,
       product: {
-        select: { category: true, brand: true },
+        select: { category: true, brand: true, supplyChainData: true },
       },
     },
   });
@@ -105,10 +107,21 @@ export default async function HomePage() {
     productsByGroup[key] = (productsByGroup[key] || 0) + 1;
   }
 
-  // Repair percentage by category+brand
+  // Repair percentage by category+brand — % of products with at least one repair in first 2 years
+  const productsRepairedFirst2Years: Record<string, Set<string>> = {};
+  for (const re of repairEvents) {
+    const mfgDate = re.product.manufacturingDate;
+    const repairDate = re.date;
+    const twoYearsAfterMfg = new Date(mfgDate.getTime() + 2 * 365.25 * 24 * 60 * 60 * 1000);
+    if (repairDate <= twoYearsAfterMfg) {
+      const key = `${re.product.category}|${re.product.brand}`;
+      if (!productsRepairedFirst2Years[key]) productsRepairedFirst2Years[key] = new Set();
+      productsRepairedFirst2Years[key].add(re.productId);
+    }
+  }
   const repairPercentageData = Object.entries(productsByGroup).map(([key, total]) => {
     const [category, brand] = key.split("|");
-    const repaired = repairByGroup[key]?.count || 0;
+    const repaired = productsRepairedFirst2Years[key]?.size || 0;
     return { category, brand, total, repaired, percentage: total > 0 ? Math.round((repaired / total) * 100) : 0 };
   });
 
@@ -126,18 +139,23 @@ export default async function HomePage() {
     return { category, brand, total, registered, percentage: total > 0 ? Math.round((registered / total) * 100) : 0 };
   });
 
-  // Second-hand resale percentage by category+brand
-  const resaleByGroup: Record<string, number> = {};
+  // Second-hand resale percentage by category+brand (with weight tracking)
+  const resaleByGroup: Record<string, { count: number; totalWeight: number }> = {};
   for (const oe of ownershipEvents) {
     if (oe.eventType === "SECOND_HAND_RESALE") {
       const key = `${oe.product.category}|${oe.product.brand}`;
-      resaleByGroup[key] = (resaleByGroup[key] || 0) + 1;
+      const supplyChain = oe.product.supplyChainData as Record<string, unknown> | null;
+      const weight = typeof supplyChain?.totalWeight === "number" ? supplyChain.totalWeight : 0;
+      if (!resaleByGroup[key]) resaleByGroup[key] = { count: 0, totalWeight: 0 };
+      resaleByGroup[key].count++;
+      resaleByGroup[key].totalWeight += weight;
     }
   }
   const resalePercentageData = Object.entries(productsByGroup).map(([key, total]) => {
     const [category, brand] = key.split("|");
-    const resold = resaleByGroup[key] || 0;
-    return { category, brand, total, resold, percentage: total > 0 ? Math.round((resold / total) * 100) : 0 };
+    const resold = resaleByGroup[key]?.count || 0;
+    const resoldWeight = resaleByGroup[key]?.totalWeight || 0;
+    return { category, brand, total, resold, resoldWeight, percentage: total > 0 ? Math.round((resold / total) * 100) : 0 };
   });
 
   // Average lifecycle of recycled products by category+brand

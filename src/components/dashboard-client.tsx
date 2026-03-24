@@ -42,6 +42,7 @@ interface PercentageKpiRow extends KpiRow {
   repaired?: number;
   registered?: number;
   resold?: number;
+  resoldWeight?: number;
 }
 
 interface LifecycleKpiRow extends KpiRow {
@@ -215,6 +216,11 @@ export function DashboardClient({ products, role, userName, userOrganization, st
                             </div>
                           );
                         })}
+                      {/* Total repairs */}
+                      <div className="border-t border-slate-200 pt-2 mt-2 flex items-center justify-between">
+                        <span className="text-sm font-semibold text-slate-700">Total</span>
+                        <Badge variant="outline" className="text-xs font-semibold">{kpiData.repairKpi.reduce((sum, r) => sum + r.repairCount, 0)} {t("dashboard.kpi.repairs")}</Badge>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -363,7 +369,12 @@ export function DashboardClient({ products, role, userName, userOrganization, st
                               <span className="text-xs text-slate-600">
                                 {catInfo?.icon || "📦"} {t(`category.${row.category}` as TKey)} — {row.brand}
                               </span>
-                              <span className="text-xs font-semibold text-purple-600">{row.percentage}%</span>
+                              <div className="flex items-center gap-2">
+                                {(row.resold ?? 0) > 0 && (
+                                  <span className="text-xs text-slate-400">({row.resold} {t("dashboard.kpi.products")})</span>
+                                )}
+                                <span className="text-xs font-semibold text-purple-600">{row.percentage}%</span>
+                              </div>
                             </div>
                             <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                               <div
@@ -377,6 +388,25 @@ export function DashboardClient({ products, role, userName, userOrganization, st
                     {kpiData.resalePercentage.filter((r) => r.percentage > 0).length === 0 && (
                       <p className="text-xs text-slate-400">{t("dashboard.kpi.noResaleData")}</p>
                     )}
+                    {(() => {
+                      const totalWeight = kpiData.resalePercentage.reduce((sum, r) => sum + (r.resoldWeight || 0), 0);
+                      const totalResold = kpiData.resalePercentage.reduce((sum, r) => sum + (r.resold || 0), 0);
+                      if (totalResold > 0) {
+                        return (
+                          <div className="border-t border-slate-200 pt-2 mt-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-slate-500 font-medium">
+                                {t("dashboard.kpi.totalResaleWeight")}
+                              </span>
+                              <span className="text-xs font-semibold text-purple-700">
+                                {totalWeight.toFixed(1)} kg
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                 </CardContent>
               </Card>
