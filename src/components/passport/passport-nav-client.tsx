@@ -15,25 +15,26 @@ export function PassportNavClient({ role, userName }: PassportNavClientProps) {
   const { t } = useLocale();
 
   return (
-    <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
-      <Link href="/" className="flex items-center gap-3 hover:opacity-80">
-        <span className="text-2xl">📋</span>
-        <span className="font-bold text-lg text-slate-900">{t("nav.title")}</span>
+    <nav className="bg-white border-b border-stone-200 px-6 py-3 flex items-center justify-between">
+      <Link href="/" className="flex items-center gap-2 hover:opacity-80">
+        <span className="font-bold text-lg tracking-tight text-stone-900">DPP</span>
+        <span className="text-stone-300 font-light">|</span>
+        <span className="text-sm font-medium text-stone-500">{t("nav.title")}</span>
       </Link>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <LanguageSwitcher />
-        <Link href="/about" className="text-sm text-slate-500 hover:text-slate-700">
+        <Link href="/about" className="text-sm text-stone-400 hover:text-teal-700 transition-colors">
           {t("nav.about")}
         </Link>
         {userName ? (
           <>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs border-stone-300 text-stone-500 font-normal">
               {t(`role.${role}` as TKey)}
             </Badge>
-            <span className="text-sm text-slate-600">{userName}</span>
+            <span className="text-sm font-medium text-stone-600">{userName}</span>
           </>
         ) : (
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs bg-stone-100 text-stone-500 font-normal">
             {t("nav.publicAccess")}
           </Badge>
         )}

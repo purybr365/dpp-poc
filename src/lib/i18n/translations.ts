@@ -422,6 +422,44 @@ export const translations = {
     "about.techStack": "Stack Tecnológica do POC",
     "about.realDataFooter": "Dados reais: JG-SUSTENTARE • WK Solutions • Greentech",
 
+    // Dashboard tabs
+    "dashboard.tab.overview": "Visão Geral",
+    "dashboard.tab.products": "Produtos",
+    "dashboard.tab.kpis": "Indicadores",
+
+    // Repair issue translations (database values are in pt-BR)
+    "repairIssue.Compressor não liga": "Compressor não liga",
+    "repairIssue.Vazamento de água na base": "Vazamento de água na base",
+    "repairIssue.Termostato com defeito": "Termostato com defeito",
+    "repairIssue.Placa eletrônica queimada": "Placa eletrônica queimada",
+    "repairIssue.Borracha de vedação ressecada": "Borracha de vedação ressecada",
+    "repairIssue.Motor do ventilador com ruído": "Motor do ventilador com ruído",
+    "repairIssue.Resistência de degelo queimada": "Resistência de degelo queimada",
+    "repairIssue.Bomba de drenagem entupida": "Bomba de drenagem entupida",
+
+    // Recycler KPIs
+    "dashboard.kpi.recyclerTitle": "Indicadores de Reciclagem",
+    "dashboard.kpi.recyclingRateByBrand": "Taxa de Reciclagem por Marca",
+    "dashboard.kpi.conditionBreakdown": "Condição dos Produtos Recebidos",
+    "dashboard.kpi.materialsRecovered": "Materiais Recuperados",
+    "dashboard.kpi.realVsEstimated": "Dados Reais vs Estimados",
+    "dashboard.kpi.realData": "Dados Reais",
+    "dashboard.kpi.estimatedData": "Dados Estimados",
+    "dashboard.kpi.avgRecyclingRate": "Taxa Média de Reciclagem",
+    "dashboard.kpi.functional": "Funcional",
+    "dashboard.kpi.partiallyFunctional": "Parcialmente Funcional",
+    "dashboard.kpi.nonFunctional": "Não Funcional",
+
+    // Repair Tech KPIs
+    "dashboard.kpi.repairTechTitle": "Indicadores de Reparo",
+    "dashboard.kpi.mostCommonIssues": "Problemas Mais Comuns",
+    "dashboard.kpi.repairSuccessRate": "Taxa de Sucesso dos Reparos",
+    "dashboard.kpi.avgRepairCost": "Custo Médio de Reparo",
+    "dashboard.kpi.passed": "Aprovado",
+    "dashboard.kpi.conditional": "Condicional",
+    "dashboard.kpi.failed": "Falhou",
+    "dashboard.kpi.total": "Total",
+
     // Time
     "time.year": "ano",
     "time.years": "anos",
@@ -825,6 +863,44 @@ export const translations = {
     "about.techStack": "POC Technology Stack",
     "about.realDataFooter": "Real data: JG-SUSTENTARE • WK Solutions • Greentech",
 
+    // Dashboard tabs
+    "dashboard.tab.overview": "Overview",
+    "dashboard.tab.products": "Products",
+    "dashboard.tab.kpis": "Indicators",
+
+    // Repair issue translations
+    "repairIssue.Compressor não liga": "Compressor won't start",
+    "repairIssue.Vazamento de água na base": "Water leak at base",
+    "repairIssue.Termostato com defeito": "Faulty thermostat",
+    "repairIssue.Placa eletrônica queimada": "Burnt control board",
+    "repairIssue.Borracha de vedação ressecada": "Dried door gasket",
+    "repairIssue.Motor do ventilador com ruído": "Noisy fan motor",
+    "repairIssue.Resistência de degelo queimada": "Burnt defrost heater",
+    "repairIssue.Bomba de drenagem entupida": "Clogged drain pump",
+
+    // Recycler KPIs
+    "dashboard.kpi.recyclerTitle": "Recycling Indicators",
+    "dashboard.kpi.recyclingRateByBrand": "Recycling Rate by Brand",
+    "dashboard.kpi.conditionBreakdown": "Product Condition at Reception",
+    "dashboard.kpi.materialsRecovered": "Materials Recovered",
+    "dashboard.kpi.realVsEstimated": "Real vs Estimated Data",
+    "dashboard.kpi.realData": "Real Data",
+    "dashboard.kpi.estimatedData": "Estimated Data",
+    "dashboard.kpi.avgRecyclingRate": "Average Recycling Rate",
+    "dashboard.kpi.functional": "Functional",
+    "dashboard.kpi.partiallyFunctional": "Partially Functional",
+    "dashboard.kpi.nonFunctional": "Non-Functional",
+
+    // Repair Tech KPIs
+    "dashboard.kpi.repairTechTitle": "Repair Indicators",
+    "dashboard.kpi.mostCommonIssues": "Most Common Issues",
+    "dashboard.kpi.repairSuccessRate": "Repair Success Rate",
+    "dashboard.kpi.avgRepairCost": "Average Repair Cost",
+    "dashboard.kpi.passed": "Passed",
+    "dashboard.kpi.conditional": "Conditional",
+    "dashboard.kpi.failed": "Failed",
+    "dashboard.kpi.total": "Total",
+
     // Time
     "time.year": "year",
     "time.years": "years",
@@ -1227,6 +1303,44 @@ export const translations = {
     "about.roadmapEspr": "Intercambio de datos con sistemas de DPP europeos vía protocolo estandarizado",
     "about.techStack": "Stack Tecnológica del POC",
     "about.realDataFooter": "Datos reales: JG-SUSTENTARE • WK Solutions • Greentech",
+
+    // Dashboard tabs
+    "dashboard.tab.overview": "Resumen",
+    "dashboard.tab.products": "Productos",
+    "dashboard.tab.kpis": "Indicadores",
+
+    // Repair issue translations
+    "repairIssue.Compressor não liga": "Compresor no enciende",
+    "repairIssue.Vazamento de água na base": "Fuga de agua en la base",
+    "repairIssue.Termostato com defeito": "Termostato defectuoso",
+    "repairIssue.Placa eletrônica queimada": "Placa electrónica quemada",
+    "repairIssue.Borracha de vedação ressecada": "Junta de puerta reseca",
+    "repairIssue.Motor do ventilador com ruído": "Motor del ventilador ruidoso",
+    "repairIssue.Resistência de degelo queimada": "Resistencia de deshielo quemada",
+    "repairIssue.Bomba de drenagem entupida": "Bomba de drenaje obstruida",
+
+    // Recycler KPIs
+    "dashboard.kpi.recyclerTitle": "Indicadores de Reciclaje",
+    "dashboard.kpi.recyclingRateByBrand": "Tasa de Reciclaje por Marca",
+    "dashboard.kpi.conditionBreakdown": "Condición de Productos Recibidos",
+    "dashboard.kpi.materialsRecovered": "Materiales Recuperados",
+    "dashboard.kpi.realVsEstimated": "Datos Reales vs Estimados",
+    "dashboard.kpi.realData": "Datos Reales",
+    "dashboard.kpi.estimatedData": "Datos Estimados",
+    "dashboard.kpi.avgRecyclingRate": "Tasa Promedio de Reciclaje",
+    "dashboard.kpi.functional": "Funcional",
+    "dashboard.kpi.partiallyFunctional": "Parcialmente Funcional",
+    "dashboard.kpi.nonFunctional": "No Funcional",
+
+    // Repair Tech KPIs
+    "dashboard.kpi.repairTechTitle": "Indicadores de Reparación",
+    "dashboard.kpi.mostCommonIssues": "Problemas Más Comunes",
+    "dashboard.kpi.repairSuccessRate": "Tasa de Éxito de Reparaciones",
+    "dashboard.kpi.avgRepairCost": "Costo Promedio de Reparación",
+    "dashboard.kpi.passed": "Aprobado",
+    "dashboard.kpi.conditional": "Condicional",
+    "dashboard.kpi.failed": "Falló",
+    "dashboard.kpi.total": "Total",
 
     // Time
     "time.year": "año",

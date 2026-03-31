@@ -17,32 +17,28 @@ const ROLE_CARDS = [
     name: "Ana Silva",
     role: "MANUFACTURER",
     organization: "Brastemp (Whirlpool)",
-    icon: "🏭",
-    color: "bg-blue-50 border-blue-200 hover:border-blue-400",
+    initial: "M",
   },
   {
     email: "consumidor@dpp.br",
     name: "Maria Oliveira",
     role: "CONSUMER",
-    organization: "Pessoa Física",
-    icon: "👤",
-    color: "bg-green-50 border-green-200 hover:border-green-400",
+    organization: "Pessoa Fisica",
+    initial: "C",
   },
   {
     email: "tecnico@dpp.br",
-    name: "João Pereira",
+    name: "Joao Pereira",
     role: "REPAIR_TECH",
-    organization: "Brastemp Assistência",
-    icon: "🔧",
-    color: "bg-orange-50 border-orange-200 hover:border-orange-400",
+    organization: "Brastemp Assistencia",
+    initial: "R",
   },
   {
     email: "reciclador@dpp.br",
     name: "Roberto Costa",
     role: "RECYCLER",
     organization: "JG-SUSTENTARE",
-    icon: "♻️",
-    color: "bg-emerald-50 border-emerald-200 hover:border-emerald-400",
+    initial: "E",
   },
 ];
 
@@ -95,145 +91,160 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+    <div className="min-h-screen bg-stone-50 flex flex-col font-[var(--font-sans)]">
       {/* Header */}
-      <header className="py-8 text-center">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <span className="text-4xl">📋</span>
-          <h1 className="text-3xl font-bold text-slate-900">
-            {t("login.title")}
+      <header className="pt-16 pb-10 text-center px-4">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <h1 className="text-3xl font-semibold tracking-tight text-stone-900">
+            Digital Product Passport
           </h1>
+          <span className="ml-2 text-[10px] font-medium uppercase tracking-widest text-stone-400 border border-stone-300 rounded px-1.5 py-0.5 leading-none relative top-[-2px]">
+            POC
+          </span>
         </div>
-        <p className="text-lg text-slate-600">
+        <p className="text-sm text-stone-500 mt-2 max-w-md mx-auto leading-relaxed">
           {t("login.subtitle")}
         </p>
-        <p className="text-sm text-slate-400 mt-1">
-          {t("login.poc")}
-        </p>
-        <div className="flex justify-center mt-3">
+        <div className="flex justify-center mt-4">
           <LanguageSwitcher />
         </div>
       </header>
 
-      {/* Role Selector */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 pb-12 w-full">
-        <div className="text-center mb-8">
-          <h2 className="text-xl font-semibold text-slate-700 mb-1">
+      {/* Main Content */}
+      <main className="flex-1 max-w-xl mx-auto px-4 pb-16 w-full">
+        <div className="mb-6">
+          <h2 className="text-sm font-medium text-stone-900 mb-1">
             {t("login.selectProfile")}
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-xs text-stone-400">
             {t("login.profileDescription")}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
           {ROLE_CARDS.map((card) => (
-            <Card
+            <button
               key={card.email}
-              className={`cursor-pointer transition-all duration-200 border-2 ${card.color} ${
-                loading === card.email ? "opacity-75 scale-95" : "hover:scale-[1.02] hover:shadow-md"
-              }`}
-              onClick={() => !loading && handleDemoLogin(card.email)}
+              type="button"
+              disabled={!!loading}
+              onClick={() => handleDemoLogin(card.email)}
+              className={`group text-left w-full rounded-lg border border-stone-200 bg-white
+                border-l-[3px] border-l-teal-700
+                transition-all duration-150
+                ${
+                  loading === card.email
+                    ? "opacity-60 scale-[0.98]"
+                    : "hover:border-stone-300 hover:shadow-sm hover:bg-stone-50/50"
+                }
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2
+              `}
             >
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{card.icon}</span>
-                  <div>
-                    <CardTitle className="text-base">
+              <div className="px-4 py-4">
+                <div className="flex items-start gap-3">
+                  {/* Icon circle */}
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-50 border border-teal-100 flex items-center justify-center">
+                    <span className="text-xs font-semibold text-teal-700">
+                      {card.initial}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-stone-900">
                       {t(`role.${card.role}` as TKey)}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
+                    </div>
+                    <div className="text-xs text-stone-400 mt-0.5">
                       {card.organization}
-                    </CardDescription>
+                    </div>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-slate-600 mb-2">
+                <p className="text-xs text-stone-500 mt-2.5 leading-relaxed">
                   {t(`roleDesc.${card.role}` as TKey)}
                 </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">{card.name}</span>
+                <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-stone-100">
+                  <span className="text-[11px] text-stone-400">{card.name}</span>
                   {loading === card.email ? (
-                    <span className="text-xs text-slate-500 animate-pulse">
+                    <span className="text-[11px] text-stone-400 animate-pulse">
                       {t("login.entering")}
                     </span>
                   ) : (
-                    <Button variant="ghost" size="sm" className="text-xs h-7">
+                    <span className="text-[11px] font-medium text-teal-700 group-hover:underline">
                       {t("login.enter")}
-                    </Button>
+                    </span>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </button>
           ))}
         </div>
 
         {error && (
-          <div className="text-center text-red-600 text-sm mb-4">{error}</div>
+          <div className="text-center text-sm text-red-600 mb-6 bg-red-50 border border-red-100 rounded-md py-2 px-3">
+            {error}
+          </div>
         )}
 
         {/* Manual Login Toggle */}
         <div className="text-center">
           <button
             onClick={() => setShowManual(!showManual)}
-            className="text-sm text-slate-400 hover:text-slate-600 underline"
+            className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
           >
             {showManual ? t("login.hideManual") : t("login.manualLogin")}
           </button>
         </div>
 
         {showManual && (
-          <Card className="max-w-sm mx-auto mt-4">
-            <CardHeader>
-              <CardTitle className="text-base">{t("login.manualTitle")}</CardTitle>
-              <CardDescription className="text-xs">
+          <div className="max-w-sm mx-auto mt-4 rounded-lg border border-stone-200 bg-white p-5">
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-stone-900">
+                {t("login.manualTitle")}
+              </h3>
+              <p className="text-xs text-stone-400 mt-0.5">
                 {t("login.manualDescription")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleManualLogin} className="space-y-3">
-                <div>
-                  <Label htmlFor="email" className="text-sm">
-                    {t("login.email")}
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="fabricante@dpp.br"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="password" className="text-sm">
-                    {t("login.password")}
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="dpp2026"
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading === "manual"}
-                >
-                  {loading === "manual" ? t("login.entering") : t("login.submit")}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+            <form onSubmit={handleManualLogin} className="space-y-3">
+              <div>
+                <Label htmlFor="email" className="text-xs font-medium text-stone-700">
+                  {t("login.email")}
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="fabricante@dpp.br"
+                  required
+                  className="mt-1 h-9 text-sm border-stone-200 focus-visible:ring-teal-700"
+                />
+              </div>
+              <div>
+                <Label htmlFor="password" className="text-xs font-medium text-stone-700">
+                  {t("login.password")}
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="dpp2026"
+                  required
+                  className="mt-1 h-9 text-sm border-stone-200 focus-visible:ring-teal-700"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full h-9 text-sm bg-teal-700 hover:bg-teal-800 text-white"
+                disabled={loading === "manual"}
+              >
+                {loading === "manual" ? t("login.entering") : t("login.submit")}
+              </Button>
+            </form>
+          </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-slate-400 border-t">
+      <footer className="py-5 text-center text-[11px] text-stone-400 border-t border-stone-200">
         {t("footer.text")}
       </footer>
     </div>

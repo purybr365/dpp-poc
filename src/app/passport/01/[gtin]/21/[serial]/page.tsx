@@ -122,17 +122,19 @@ export default async function PassportGS1Page({
         <LifecycleTimeline currentStage={product.lifecycleStage} />
 
         <Tabs defaultValue={visibleSections[0]} className="w-full">
-          <TabsList className="flex flex-wrap h-auto gap-1 bg-transparent p-0 mb-8">
-            {visibleSections.map((key) => (
-              <TabsTrigger
-                key={key}
-                value={key}
-                className="text-xs data-[state=active]:bg-slate-900 data-[state=active]:text-white rounded-full px-3 py-1.5 border"
-              >
-                <PassportTabsClient translationKey={`section.${key}` as never} />
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="bg-transparent border-b border-stone-200 rounded-none h-auto p-0 mb-8 flex gap-0 w-max min-w-full">
+              {visibleSections.map((key) => (
+                <TabsTrigger
+                  key={key}
+                  value={key}
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-700 data-[state=active]:bg-transparent data-[state=active]:text-stone-900 data-[state=active]:shadow-none text-stone-400 px-3 pb-3 pt-1 text-xs font-medium whitespace-nowrap"
+                >
+                  <PassportTabsClient translationKey={`section.${key}` as never} />
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
           {visibleSections.includes("supplyChain") && filtered.supplyChain && (
             <TabsContent value="supplyChain">
@@ -163,6 +165,8 @@ export default async function PassportGS1Page({
               <OwnershipSection
                 events={filtered.ownershipEvents}
                 manufacturingFacility={product.manufacturingFacility}
+                repairEvents={filtered.repairData || []}
+                endOfLifeRecords={filtered.endOfLife || []}
               />
             </TabsContent>
           )}

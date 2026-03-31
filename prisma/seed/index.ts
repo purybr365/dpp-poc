@@ -148,7 +148,7 @@ async function seedRealProducts() {
         brand: rp.brand,
         model: rp.model,
         productCode: rp.productCode,
-        manufacturingDate: new Date(rp.processingDate.getTime() - 365 * 3 * 86400000), // ~3 years before recycling
+        manufacturingDate: new Date(rp.processingDate.getTime() - (365 * (2 + Math.random() * 8)) * 86400000), // 2-10 years before recycling (varied)
         manufacturingFacility: rp.brand === "Consul" ? "Joinville, SC" : rp.brand === "Brastemp" ? "Rio Claro, SP" : "Manaus, AM",
         batchNumber: `LOT-${Math.floor(Math.random() * 9000 + 1000)}`,
         lifecycleStage: "RECYCLED",
@@ -218,7 +218,7 @@ async function seedRealProducts() {
     // Add ownership chain — real recycled products: ~50% with registration, ~30% with second-hand resale
     const addRegistration = Math.random() < 0.5;
     const addSecondHandResale = Math.random() < 0.3;
-    const mfgDate = new Date(rp.processingDate.getTime() - 365 * 3 * 86400000);
+    const mfgDate = product.manufacturingDate;
     const ownershipEvents = generateOwnershipChain(product.id, rp.brand, "RECYCLED", { addRegistration, addSecondHandResale, manufacturingDate: mfgDate });
     for (const event of ownershipEvents) {
       await prisma.ownershipEvent.create({ data: event as never });

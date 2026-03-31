@@ -38,81 +38,85 @@ export function ProductHero({ product, category, productId, gtin, serialNumber }
     ? `/api/products/${productId}/qr-code?format=svg`
     : null;
 
+  const categoryInitial = categoryLabel ? categoryLabel.charAt(0).toUpperCase() : "P";
+
   return (
-    <Card className="overflow-hidden">
+    <Card className="border border-stone-200 shadow-sm">
       <CardContent className="p-6">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Icon / Image area */}
-          <div className="flex-shrink-0 w-24 h-24 bg-slate-100 rounded-xl flex items-center justify-center">
-            <span className="text-5xl">{category?.icon || "📦"}</span>
+          {/* Category initial */}
+          <div className="flex-shrink-0 w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center self-start">
+            <span className="text-xl font-semibold text-teal-700">{categoryInitial}</span>
           </div>
 
           {/* Product Info */}
-          <div className="flex-1 space-y-3">
-            <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0 space-y-4">
+            {/* Title row */}
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">
+                <h1 className="text-xl font-semibold text-stone-900 tracking-tight">
                   {product.brand as string} {product.model as string}
                 </h1>
-                <p className="text-slate-500">{categoryLabel}</p>
+                <p className="text-sm text-stone-400 mt-0.5">{categoryLabel}</p>
               </div>
               <Badge
-                className={`text-sm ${
+                className={`text-xs font-medium px-2.5 py-0.5 flex-shrink-0 ${
                   product.lifecycleStage === "RECYCLED"
-                    ? "bg-emerald-100 text-emerald-700"
+                    ? "bg-teal-50 text-teal-700 border border-teal-200"
                     : product.lifecycleStage === "IN_USE"
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-slate-100 text-slate-700"
+                    ? "bg-teal-50 text-teal-700 border border-teal-200"
+                    : "bg-stone-50 text-stone-600 border border-stone-200"
                 }`}
               >
                 {stageLabel}
               </Badge>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            {/* Data grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 text-sm">
               <div>
-                <span className="text-slate-400 block text-xs">{t("passport.serial")}</span>
-                <span className="font-mono text-slate-700">{product.serialNumber as string}</span>
+                <span className="text-xs text-stone-400 block mb-0.5">{t("passport.serial")}</span>
+                <span className="font-mono text-sm text-stone-700">{product.serialNumber as string}</span>
               </div>
               {!!product.gtin && (
                 <div>
-                  <span className="text-slate-400 block text-xs">{t("passport.gtin")}</span>
-                  <span className="font-mono text-slate-700">{product.gtin as string}</span>
+                  <span className="text-xs text-stone-400 block mb-0.5">{t("passport.gtin")}</span>
+                  <span className="font-mono text-sm text-stone-700">{product.gtin as string}</span>
                 </div>
               )}
               <div>
-                <span className="text-slate-400 block text-xs">{t("passport.manufacturing")}</span>
-                <span className="text-slate-700">{mfgDate}</span>
+                <span className="text-xs text-stone-400 block mb-0.5">{t("passport.manufacturing")}</span>
+                <span className="text-sm text-stone-700">{mfgDate}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-xs">{t("passport.factory")}</span>
-                <span className="text-slate-700">{product.manufacturingFacility as string}</span>
+                <span className="text-xs text-stone-400 block mb-0.5">{t("passport.factory")}</span>
+                <span className="text-sm text-stone-700">{product.manufacturingFacility as string}</span>
               </div>
             </div>
 
             {manufacturer && (
-              <div className="text-xs text-slate-400">
+              <p className="text-xs text-stone-400">
                 {t("passport.manufacturer")}: {manufacturer.organization || manufacturer.name}
-              </div>
+              </p>
             )}
 
-            <div className="text-xs font-mono text-slate-300 break-all">
+            <p className="text-[11px] font-mono text-stone-300 break-all leading-relaxed">
               {product.uid as string}
-            </div>
+            </p>
           </div>
 
           {/* QR Code */}
           {qrUrl && (
-            <div className="flex-shrink-0 flex flex-col items-center gap-1 md:self-start self-center">
+            <div className="flex-shrink-0 flex flex-col items-center gap-2 md:self-start self-center md:pl-4 md:border-l md:border-stone-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={qrUrl}
                 alt={t("passport.qrAlt")}
-                width={120}
-                height={120}
+                width={100}
+                height={100}
                 className="rounded"
               />
-              <span className="text-[10px] text-slate-400">{t("passport.scanToAccess")}</span>
+              <span className="text-[10px] text-stone-400">{t("passport.scanToAccess")}</span>
             </div>
           )}
         </div>

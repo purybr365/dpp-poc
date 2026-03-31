@@ -46,6 +46,8 @@ export default async function HomePage() {
       issueDescription: true,
       date: true,
       productId: true,
+      totalCost: true,
+      postRepairStatus: true,
       product: {
         select: { category: true, brand: true, manufacturingDate: true },
       },
@@ -74,6 +76,19 @@ export default async function HomePage() {
         select: { processingDate: true },
         take: 1,
         orderBy: { processingDate: "desc" },
+      },
+    },
+  });
+
+  // Fetch EOL records for recycler KPIs
+  const eolRecords = await prisma.endOfLifeRecord.findMany({
+    select: {
+      recyclingRate: true,
+      functionalStatus: true,
+      isRealData: true,
+      disassemblyReport: true,
+      product: {
+        select: { category: true, brand: true },
       },
     },
   });
@@ -176,6 +191,79 @@ export default async function HomePage() {
     return { category, brand, avgMonths: Math.round(data.totalMonths / data.count), count: data.count };
   });
 
+  // --- Recycler KPIs ---
+  const recyclingRateByBrand: Record<string, { totalRate: number; count: number }> = {};
+  const conditionCounts = { functional: 0, partiallyFunctional: 0, nonFunctional: 0 };
+  let realCount = 0;
+  let estimatedCount = 0;
+
+  for (const eol of eolRecords) {
+    const brand = eol.product.brand;
+    if (eol.recyclingRate) {
+      if (!recyclingRateByBrand[brand]) recyclingRateByBrand[brand] = { totalRate: 0, count: 0 };
+      recyclingRateByBrand[brand].totalRate += Number(eol.recyclingRate);
+      recyclingRateByBrand[brand].count++;
+    }
+    if (eol.functionalStatus === "functional") conditionCounts.functional++;
+    else if (eol.functionalStatus === "partially-functional") conditionCounts.partiallyFunctional++;
+    else conditionCounts.nonFunctional++;
+
+    if (eol.isRealData) realCount++;
+    else estimatedCount++;
+  }
+
+  const recyclerKpiData = {
+    recyclingRateByBrand: Object.entries(recyclingRateByBrand).map(([brand, data]) => ({
+      brand,
+      avgRate: Math.round((data.totalRate / data.count) * 10) / 10,
+      count: data.count,
+    })),
+    conditionCounts,
+    realVsEstimated: { real: realCount, estimated: estimatedCount },
+  };
+
+  // --- Repair Tech KPIs ---
+  const issueFrequency: Record<string, number> = {};
+  const statusCounts = { passed: 0, conditional: 0, failed: 0 };
+  let totalRepairCost = 0;
+  let repairCostCount = 0;
+  const costByCategory: Record<string, { total: number; count: number }> = {};
+
+  for (const re of repairEvents) {
+    // Issue frequency
+    issueFrequency[re.issueDescription] = (issueFrequency[re.issueDescription] || 0) + 1;
+
+    // Success rate
+    if (re.postRepairStatus === "passed") statusCounts.passed++;
+    else if (re.postRepairStatus === "failed") statusCounts.failed++;
+    else statusCounts.conditional++;
+
+    // Average cost
+    if (re.totalCost) {
+      const cost = Number(re.totalCost);
+      totalRepairCost += cost;
+      repairCostCount++;
+      const cat = re.product.category;
+      if (!costByCategory[cat]) costByCategory[cat] = { total: 0, count: 0 };
+      costByCategory[cat].total += cost;
+      costByCategory[cat].count++;
+    }
+  }
+
+  const repairTechKpiData = {
+    topIssues: Object.entries(issueFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([issue, count]) => ({ issue, count })),
+    statusCounts,
+    avgCost: repairCostCount > 0 ? Math.round(totalRepairCost / repairCostCount) : 0,
+    costByCategory: Object.entries(costByCategory).map(([category, data]) => ({
+      category,
+      avgCost: Math.round(data.total / data.count),
+      count: data.count,
+    })),
+  };
+
   const stats = {
     totalProducts: products.length,
     recycled: products.filter((p) => p.lifecycleStage === "RECYCLED").length,
@@ -197,6 +285,8 @@ export default async function HomePage() {
     registeredPercentage: registeredPercentageData,
     resalePercentage: resalePercentageData,
     lifecycleKpi: lifecycleKpiData,
+    recyclerKpi: recyclerKpiData,
+    repairTechKpi: repairTechKpiData,
   };
 
   return (
